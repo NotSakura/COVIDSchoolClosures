@@ -1,0 +1,63 @@
+---
+title: "COVIDSchoolClosures"
+author: "Christina, Yan, Sakura"
+format: pdf
+---
+# Introduction
+
+
+# Data
+
+## Data Source and Collection //Methodology
+ Basically cite
+ 
+## Data Cleaning
+What data set did we clean and why. Explain the variable here too ig
+
+
+
+# Results
+The graphs we made and describe the trends. Only talk abotu results not what they mean
+
+
+
+## First Graph
+
+
+
+
+##Second Graph
+
+
+
+## Thirds Graph
+
+
+# Discussion
+
+## Interesting point 1
+
+
+##Intreesting point 2
+
+## interesting point 3
+
+
+##Ethics and Bias
+could talk about mental health maybe but it might apply to other "interesting point"
+
+## weakness and limitations
+
+
+## how to solve the limitations
+
+
+## Furthur questions?
+
+
+# Appendix
+
+
+
+# Reference
+
