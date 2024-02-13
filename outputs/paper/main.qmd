@@ -35,10 +35,13 @@ library(kableExtra)
 library(haven)
 library(tsibble)
 library(ggplot2)
-
+library(countrycode)
+library(lubridate)
 ```
 
 # Introduction
+
+The outcomes of this paper are that there is an over all increase in the percent of enrollment as more in person schools are opened in the educational districts of United States. The concept fo educational districts will be described later in the data section for the user's aid but in this context it is not the most important. 
 
 # Data
 
@@ -49,6 +52,7 @@ We use @citeR to make this paper as well as the graphs and topic were taken insp
 ## Data Cleaning
 
 What data set did we clean and why. Explain the variable here too ig The data provided originally was called nces
+Some data sets cleaned were 
 
 # Results
 
@@ -56,39 +60,102 @@ The graphs we made and describe the trends. Only talk abotu results not what the
 
 ## First Graph
 
+```{r}
+#| echo: false
+#graph 1
+covid <- read.csv("../../inputs/data/OxCGRT_compact_national_v1.csv")
+head(covid)
+#cleaning dates column
+##use as.date for expected date format, as.character to convert column to string
+covid$Date <- as.Date(as.character(covid$Date),
+                      format="%Y%m%d")
+
+#create new column for years
+covid$Year <- year(covid$Date)
+
+#filtering signifcant variables
+covid <- covid %>% 
+  select(Date, Year, CountryName, C1M_School.closing)
+
+#using package 'countrycode', create new column 'continent' that lists continent of country
+##sourcevar is input, origin tells function input is list of countries
+##origin
+covid$Continent <- countrycode(sourcevar = covid$CountryName,
+                            origin = "country.name",
+                            destination = "continent")
+
+covid <- filter(covid, !is.na(Continent))
+covid<- covid %>% group_by(Year)
+```
+
+As the original paper has divided the countries by Region, this paper has divided the countries by continent, to compare and contrast the findings based on the separation of the countries. 
+
+The original paper states that in their findings, the United States had longer terms of school closures, while given by the graph I have produced, it seems 
+
+
+```{r}
+#| echo: false
+#| warning: false
+
+#graph 2
+
+covid_summary <- covid %>%
+  group_by(Year, Continent) %>%
+  summarise(Total_School_Closings = sum(C1M_School.closing, na.rm = TRUE))
+
+#reordering in descending order
+covid_summary$Continent <- reorder(covid_summary$Continent, -covid_summary$Total_School_Closings)
+
+#
+ggplot(covid_summary, aes(x = Continent, y = Total_School_Closings, fill = Continent)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(x = "Continent", y = "Total School Closings",
+       title = "Total School Closings by Continent")
+
+ggplot(covid_summary, aes(x = Continent, y = Total_School_Closings, fill = Continent)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  facet_wrap(~Year) +
+  labs(x = "Continent", y = "Total School Closings",
+       title = "Total School Closings by Continent")
+```
+
+
 ##Second Graph
 
 ```{r, fig.align='center', fig.cap = "Average Grade Change by In Person Attendence"}
 
 #| echo: false
+#| warning: false
 
 score_data = read_csv("../../inputs/data/scores_lm_demographics.csv")
 
 
-clean_score_data_inperson <- score_data %>%
-  select(subject, change_2017_2018, change_2018_2019, change_2019_2021, change_2021_2022, share_inperson, urban_centric_locale) %>%
-  rename_with(~ sub("^change_(\\d{4})_(\\d{4})$", "Spring_\\2", .), starts_with("change")) %>%
+clean_score_data_inperson <- score_data |>
+  select(subject, change_2017_2018, change_2018_2019, change_2019_2021, change_2021_2022, share_inperson, urban_centric_locale) |>
+  rename_with(~ sub("^change_(\\d{4})_(\\d{4})$", "Spring_\\2", .), starts_with("change")) |>
   mutate(share_inperson_grouped = cut(share_inperson * 100, breaks = seq(0, 100, by = 25), include.lowest = TRUE, right = FALSE, labels = c("0-25", "25-50", "50-75", "75-100")))
 
 # Pivot the data to a long format
-score_data_long_inperson <- clean_score_data_inperson %>%
+score_data_long_inperson <- clean_score_data_inperson |>
   pivot_longer(cols = starts_with("Spring"), names_to = "time_period", values_to = "change_score")
 
 # Group by 'subject', 'share_inperson_grouped', and 'time_period', then summarize
-score_data_summary_inperson <- score_data_long_inperson %>%
-  group_by(subject, share_inperson_grouped, time_period) %>%
+score_data_summary_inperson <- score_data_long_inperson |>
+  group_by(subject, share_inperson_grouped, time_period) |>
   summarise(
     mean_change = mean(change_score, na.rm = TRUE),
     .groups = 'drop'
   )
 
 # Now prepare data for the 'urban_centric_locale' grouping
-score_data_long_locale <- clean_score_data_inperson %>%
+score_data_long_locale <- clean_score_data_inperson |>
   pivot_longer(cols = starts_with("Spring"), names_to = "time_period", values_to = "change_score")
 
 # Group by 'subject', 'urban_centric_locale', and 'time_period', then summarize
-score_data_summary_locale <- score_data_long_locale %>%
-  group_by(subject, urban_centric_locale, time_period) %>%
+score_data_summary_locale <- score_data_long_locale |>
+  group_by(subject, urban_centric_locale, time_period) |>
   summarise(
     mean_change = mean(change_score, na.rm = TRUE),
     .groups = 'drop'
@@ -142,9 +209,12 @@ ggplot(score_data_summary_locale, aes(y = urban_centric_locale, x = round(mean_c
 ```
 
 ## Third Graph
+It is no secret that COVID-19 affected the school enrollment rates, when the students were forced to learn in a virtual environment. In this section the paper will uncover any trends in enrollment rates with relation to the number of in-person learning offered in each district.
+
 
 ```{r}
 #| echo: false
+#| warning: false
 ## Only run once cause super big data which will slow down
 raw_d <- read_dta("../../inputs/data/nces_district_enrollment_2018_2020.dta")
 other_raw <- read_csv("../../inputs/data/District_Overall_Shares.csv")
@@ -155,6 +225,7 @@ other_raw$leaid <- as.character(other_raw$leaid)
 
 ```{r}
 #| echo: false
+#| warning: false
 data <- raw_d |>
   filter(grade == 0 | grade == 99) |>
   filter(race == 99)
@@ -168,7 +239,7 @@ data <- data[data$enrollment >= 0, ]
 # Drop observations where fips is greater than 56
 data <- data[data$fips <= 56, ]
 
-data <- data %>%
+data <- data |>
   filter(!is.na(sex))
 
 
@@ -198,13 +269,15 @@ data_final <- subset(data_final, select = -fips)
 
 # Rename columns
 colnames(data_final) <- c("year", "leaid", 
-                              "enroll_male_kinder", "enroll_female_kinder", 
-                              "enroll_male_total", "enroll_female_total", 
-                              "enroll_all_kinder", "enroll_all_total")
+                              "enroll_male_total", "enroll_male_kinder", 
+                              "enroll_female_total", "enroll_female_kinder", 
+                              "enroll_all_total", "enroll_all_kinder")
+
 
 # Convert 'leaid' to numeric (assuming it's a string)
-data$leaid <- as.numeric(data$leaid)
+data_final$leaid <- as.numeric(data_final$leaid)
 other_raw$leaid <- as.numeric(other_raw$leaid)
+
 
 write_csv(x = data_final,
           file = "../data/cleaned_raw_data.csv")
@@ -213,6 +286,9 @@ write_csv(x = data_final,
 # Link data with another dataset (replace 'other_data' with your actual dataset)
 # Assuming 'leaid' is the common identifier
 merged_data <- merge(data_final, other_raw, by = "leaid")
+merged_data <- subset(merged_data, select = -DistrictName)
+merged_data <- subset(merged_data, select = -StateAbbrev)
+merged_data <- subset(merged_data, select = -StateAssignedDistrictID)
 
 write_csv(x = merged_data,
           file = "../data/merged_data.csv")
@@ -223,69 +299,85 @@ merged_data$date <- as.Date(paste0(merged_data$year, "-01-01"))
 
 
 my_tsibble <- as_tsibble(merged_data, key = leaid, index = date)
-my_tsibble <- my_tsibble %>%
-  filter(year >= 2020)
 
-# Assuming you have a tsibble called my_tsibble with appropriate columns
 
 # Calculate change_kinder
-my_tsibble <- my_tsibble %>%
+my_tsibble <- my_tsibble |>
   mutate(change_kinder = enroll_all_kinder - lag(enroll_all_kinder),
          perc_change_kinder = change_kinder / lag(enroll_all_kinder))
 
-# Calculate change_all
-my_tsibble <- my_tsibble %>%
+
+
+my_tsibble <- my_tsibble |>
+  arrange(share_inperson) |>
   mutate(change_all = enroll_all_total - lag(enroll_all_total),
          perc_change_all = change_all / lag(enroll_all_total))
 
 # Calculate change_male
-my_tsibble <- my_tsibble %>%
+my_tsibble <- my_tsibble |>
   mutate(change_male = enroll_male_kinder - lag(enroll_male_kinder),
          perc_change_male = change_male / lag(enroll_male_kinder))
 
 # Calculate change_female
-my_tsibble <- my_tsibble %>%
+my_tsibble <- my_tsibble |>
   mutate(change_female = enroll_female_kinder - lag(enroll_female_kinder),
          perc_change_female = change_female / lag(enroll_female_kinder))
 
 
 # Drop rows where absolute change_all is greater than enroll_all_total
-my_tsibble <- my_tsibble %>%
+my_tsibble <- my_tsibble |>
   filter(abs(change_all) <= enroll_all_total)
 
 # Drop rows where absolute change_kinder is greater than enroll_all_total
-my_tsibble <- my_tsibble %>%
-  filter(abs(change_kinder) <= enroll_all_total)
+my_tsibble <- my_tsibble |>
+  filter(abs(change_kinder) <= enroll_all_kinder)
 
 
-my_tsibble <- my_tsibble %>%
+my_tsibble <- my_tsibble |>
   mutate(inperson_bin = cut(share_inperson, breaks = 11))
+my_tsibble <- my_tsibble |>
+  filter(year >= 2020)
+
 
 # Compute weighted mean change in enrollment for each bin
-weighted_means_all <- my_tsibble %>%
-  group_by(inperson_bin) %>%
+weighted_means_all <- my_tsibble |>
+  group_by(inperson_bin) |>
   summarise(
     weighted_mean_change = weighted.mean(perc_change_all, enroll_all_total)
   )
 
 weighted_means_all <- subset(weighted_means_all, select = -date)
-weighted_means_all <- weighted_means_all %>%
-  group_by(inperson_bin) %>%
+weighted_means_all <- weighted_means_all |>
+  group_by(inperson_bin) |>
   summarise_at(vars(weighted_mean_change), list(weighted_mean_change = mean)
   )
 
-weighted_means_kinder <- my_tsibble %>%
-  group_by(inperson_bin) %>%
+
+weighted_means_kinder <- my_tsibble |>
+  group_by(inperson_bin) |>
   summarise(
     weighted_mean_change = weighted.mean(perc_change_kinder, enroll_all_kinder)
   )
 weighted_means_kinder <- subset(weighted_means_kinder, select = -date)
 
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-EnrollAll
+#| fig-cap: The weighted mean of the percent of overall district enrollment was calulated and graphed. The weights were decided on the bins which were cut in eleven sections based on share of in person school overall. 
+
 
 ##Graph
+# Extract the end value and convert to numeric
+weighted_means_all$inperson_bin <- as.numeric(sub(".*,", "", sub("\\]", "", weighted_means_all$inperson_bin)))
+
+
+
 ggplot(weighted_means_all, aes(x = inperson_bin , y = weighted_mean_change)) +
   geom_point() +
-  scale_y_continuous(breaks = seq(-0.2, 1.0, by = 0.2), limits = c(-0.2, 0.2))+
+  geom_smooth(formula = y ~ x, method=lm, se=FALSE)+
   labs(
     title = "Percent Change in Overall District Enrollment, Fall 2019-Fall 2020",
     x = "Share of School Year with In-Person Learning Offered, 2020-2021",
@@ -294,9 +386,25 @@ ggplot(weighted_means_all, aes(x = inperson_bin , y = weighted_mean_change)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 20, vjust = 1, hjust = 1, size = 6))
 
+```
+First, we take a look at the overall enrollment through out the districts. We can see that some values are in the negatives like the [0.364, 0.455] bin. This means that when the share of in-person school is at most 45.5% the enrollemnt rate is -0.0105% (Value found in the appendix)
+
+
+
+
+```{r}
+
+#| echo: false
+#| warning: false
+#| label: fig-EnrollKinder
+#| fig-cap: The weighted mean of the percent of kindergarden enrollment in all districts was calulated and graphed. The weights were decided on the bins which were cut in eleven sections based on share of in person school overall. 
+
+weighted_means_kinder$inperson_bin <- as.numeric(sub(".*,", "", sub("\\]", "", weighted_means_all$inperson_bin)))
+
+
 ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
-  geom_point() +
-  scale_y_continuous(breaks = seq(-0.2, 1.0, by = 0.2), limits = c(-0.2, 0.2))+
+  geom_point() + 
+  geom_smooth(formula = y ~ x, method=lm, se=FALSE)+
   labs(
     title = "Percent Change in Kindergarten Enrollment, Fall 2019-Fall 2020",
     x = "Share of School Year with In-Person Learning Offered, 2020-2021",
@@ -304,8 +412,6 @@ ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
   ) +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 20, vjust = 1, hjust = 1, size = 6))
-
-
 ```
 
 # Discussion
@@ -314,9 +420,10 @@ ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
 
 ## Intresting point 2
 
-## interesting point 3
+## Change in enrollment rate in kindergarden vs all
+The third set of graphs that were shown in the results section was graphs that showed the change in enrollment with the shares of in-person school that started (@fig-EnrollAll, @fig-EnrollKinder). As discussed in the section it seemed like the overall trend of the graph was that enrollment rates were higher the more in-person school there was. This was seen in both cases but more predominantly in the kindergarten graph (@fig-EnrollKinder). This result was interesing as this shows with younger ages the enrollment rates being higher means the children enjoy going to school in person. This is important as kindergarten is when most children start developing the fundamental socila skills required to interact with other people. 
 
-##Ethics and Bias could talk about mental health maybe but it might apply to other "interesting point"
+## Ethics and Bias could talk about mental health maybe but it might apply to other "interesting point"
 
 ## weakness and limitations
 
@@ -327,6 +434,8 @@ ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
 # Appendix
 
 ```{r}
+#| echo: false
+#| warning: false
 weighted_means_all |> kable(format = "pipe", padding = 2, col.names = c("Share of inperson", "average enrollment rate"))
 ```
 
