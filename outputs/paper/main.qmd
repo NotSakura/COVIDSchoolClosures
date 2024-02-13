@@ -5,23 +5,22 @@ format: pdf
 date: 02/12/2024
 date-format: long
 thanks: "Code and some data from this paper are available at: https://github.com/NotSakura/COVIDSchoolClosures.git"
-format: pdf
 classoption: abstract
 abstract: |
   COVID-19 was an outbreak of virus that forced many instituations to shut down for 2-3 years. Schools were no different and this paper aims to look at the effects of the said closures in school and how it affected the population. This paper finds that with more inperson schooling provided the less the enrollment rates drop(more in depth analysis in later sections). 
 include-in-header: 
   text:
     \renewcommand{\abstractname}{Abstract}
-bibliography: ref.bib
-toc: true
-toc-depth: 3
-number-sections: true
+bibliography: references.bib
 margins:
   top: 0.5in
   bottom: 0.5in
   left: 0.5in
   right: 0.5in
 ---
+
+
+
 ```{r}
 #| echo: false
 #| include: false
@@ -37,8 +36,6 @@ library(tidyr)
 library(kableExtra)
 library(haven)
 library(tsibble)
-library(readr)
-library(dplyr)
 library(ggplot2)
 
 ```
@@ -49,7 +46,7 @@ library(ggplot2)
 # Data
 
 ## Data Source and Collection //Methodology
- Basically cite
+  We use @citeR to make this paper as well as the graphs and topic were taken inspiration from @CovidPaper. Various helpful packages were used in order to clean, sort and graph this paper in a way such that the reader will not have difficulty undertsnading neither the topic nor the data sets of this paper. The packages are, @Ggplot2, @tidyverse, @rDplyr, @rReadr, @rknitr, @rJanitor, @rExtra, @rTidyr, @rHaven, @rTissible. 
  
 ## Data Cleaning
 What data set did we clean and why. Explain the variable here too ig
@@ -149,9 +146,6 @@ merged_data <- merge(data_final, other_raw, by = "leaid")
 write_csv(x = merged_data,
           file = "../data/merged_data.csv")
 
-# Get additional variables (share_inperson, share_hybrid, share_virtual)
-# from the linked dataset 
-selected_vars <- linked_data[, c("share_inperson", "share_hybrid", "share_virtual")]
 
 # Assuming 'year' is numeric (e.g., 2019, 2020)
 merged_data$date <- as.Date(paste0(merged_data$year, "-01-01"))
@@ -200,16 +194,18 @@ weighted_means_all <- my_tsibble %>%
   summarise(
     weighted_mean_change = weighted.mean(perc_change_all, enroll_all_total)
   )
+weighted_means_all <- subset(weighted_means_all, select = -date)
 
 weighted_means_kinder <- my_tsibble %>%
   group_by(inperson_bin) %>%
   summarise(
     weighted_mean_change = weighted.mean(perc_change_kinder, enroll_all_kinder)
   )
+weighted_means_kinder <- subset(weighted_means_kinder, select = -date)
 
 
 ##Graph
-ggplot(weighted_means, aes(x = inperson_bin , y = weighted_mean_change)) +
+ggplot(weighted_means_all, aes(x = inperson_bin , y = weighted_mean_change)) +
   geom_point() +
   labs(
     title = "Percent Change in Overall District Enrollment, Fall 2019-Fall 2020",
@@ -237,7 +233,8 @@ ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
 ## Interesting point 1
 
 
-##Intreesting point 2
+## Intresting point 2
+
 
 ## interesting point 3
 
@@ -256,6 +253,9 @@ could talk about mental health maybe but it might apply to other "interesting po
 
 
 # Appendix
+```{r}
+weighted_means_all |> kable(format = "pipe", padding = 2, col.names = c("Share of inperson", "average enrollment rate"))
+```
 
 
 
