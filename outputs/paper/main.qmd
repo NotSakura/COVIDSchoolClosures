@@ -65,30 +65,30 @@ The graphs we made and describe the trends. Only talk abotu results not what the
 score_data = read_csv("../../inputs/data/scores_lm_demographics.csv")
 
 
-clean_score_data_inperson <- score_data %>%
-  select(subject, change_2017_2018, change_2018_2019, change_2019_2021, change_2021_2022, share_inperson, urban_centric_locale) %>%
-  rename_with(~ sub("^change_(\\d{4})_(\\d{4})$", "Spring_\\2", .), starts_with("change")) %>%
+clean_score_data_inperson <- score_data |>
+  select(subject, change_2017_2018, change_2018_2019, change_2019_2021, change_2021_2022, share_inperson, urban_centric_locale) |>
+  rename_with(~ sub("^change_(\\d{4})_(\\d{4})$", "Spring_\\2", .), starts_with("change")) |>
   mutate(share_inperson_grouped = cut(share_inperson * 100, breaks = seq(0, 100, by = 25), include.lowest = TRUE, right = FALSE, labels = c("0-25", "25-50", "50-75", "75-100")))
 
 # Pivot the data to a long format
-score_data_long_inperson <- clean_score_data_inperson %>%
+score_data_long_inperson <- clean_score_data_inperson |>
   pivot_longer(cols = starts_with("Spring"), names_to = "time_period", values_to = "change_score")
 
 # Group by 'subject', 'share_inperson_grouped', and 'time_period', then summarize
-score_data_summary_inperson <- score_data_long_inperson %>%
-  group_by(subject, share_inperson_grouped, time_period) %>%
+score_data_summary_inperson <- score_data_long_inperson |>
+  group_by(subject, share_inperson_grouped, time_period) |>
   summarise(
     mean_change = mean(change_score, na.rm = TRUE),
     .groups = 'drop'
   )
 
 # Now prepare data for the 'urban_centric_locale' grouping
-score_data_long_locale <- clean_score_data_inperson %>%
+score_data_long_locale <- clean_score_data_inperson |>
   pivot_longer(cols = starts_with("Spring"), names_to = "time_period", values_to = "change_score")
 
 # Group by 'subject', 'urban_centric_locale', and 'time_period', then summarize
-score_data_summary_locale <- score_data_long_locale %>%
-  group_by(subject, urban_centric_locale, time_period) %>%
+score_data_summary_locale <- score_data_long_locale |>
+  group_by(subject, urban_centric_locale, time_period) |>
   summarise(
     mean_change = mean(change_score, na.rm = TRUE),
     .groups = 'drop'
@@ -155,6 +155,7 @@ other_raw$leaid <- as.character(other_raw$leaid)
 
 ```{r}
 #| echo: false
+#| warning: false
 data <- raw_d |>
   filter(grade == 0 | grade == 99) |>
   filter(race == 99)
@@ -168,7 +169,7 @@ data <- data[data$enrollment >= 0, ]
 # Drop observations where fips is greater than 56
 data <- data[data$fips <= 56, ]
 
-data <- data %>%
+data <- data |>
   filter(!is.na(sex))
 
 
@@ -223,63 +224,72 @@ merged_data$date <- as.Date(paste0(merged_data$year, "-01-01"))
 
 
 my_tsibble <- as_tsibble(merged_data, key = leaid, index = date)
-my_tsibble <- my_tsibble %>%
+my_tsibble <- my_tsibble |>
   filter(year >= 2020)
 
 # Assuming you have a tsibble called my_tsibble with appropriate columns
 
 # Calculate change_kinder
-my_tsibble <- my_tsibble %>%
+my_tsibble <- my_tsibble |>
   mutate(change_kinder = enroll_all_kinder - lag(enroll_all_kinder),
          perc_change_kinder = change_kinder / lag(enroll_all_kinder))
 
 # Calculate change_all
-my_tsibble <- my_tsibble %>%
+my_tsibble <- my_tsibble |>
   mutate(change_all = enroll_all_total - lag(enroll_all_total),
          perc_change_all = change_all / lag(enroll_all_total))
 
 # Calculate change_male
-my_tsibble <- my_tsibble %>%
+my_tsibble <- my_tsibble |>
   mutate(change_male = enroll_male_kinder - lag(enroll_male_kinder),
          perc_change_male = change_male / lag(enroll_male_kinder))
 
 # Calculate change_female
-my_tsibble <- my_tsibble %>%
+my_tsibble <- my_tsibble |>
   mutate(change_female = enroll_female_kinder - lag(enroll_female_kinder),
          perc_change_female = change_female / lag(enroll_female_kinder))
 
 
 # Drop rows where absolute change_all is greater than enroll_all_total
-my_tsibble <- my_tsibble %>%
+my_tsibble <- my_tsibble |>
   filter(abs(change_all) <= enroll_all_total)
 
 # Drop rows where absolute change_kinder is greater than enroll_all_total
-my_tsibble <- my_tsibble %>%
+my_tsibble <- my_tsibble |>
   filter(abs(change_kinder) <= enroll_all_total)
 
 
-my_tsibble <- my_tsibble %>%
+my_tsibble <- my_tsibble |>
   mutate(inperson_bin = cut(share_inperson, breaks = 11))
 
 # Compute weighted mean change in enrollment for each bin
-weighted_means_all <- my_tsibble %>%
-  group_by(inperson_bin) %>%
+weighted_means_all <- my_tsibble |>
+  group_by(inperson_bin) |>
   summarise(
     weighted_mean_change = weighted.mean(perc_change_all, enroll_all_total)
   )
 
 weighted_means_all <- subset(weighted_means_all, select = -date)
-weighted_means_all <- weighted_means_all %>%
-  group_by(inperson_bin) %>%
+weighted_means_all <- weighted_means_all |>
+  group_by(inperson_bin) |>
   summarise_at(vars(weighted_mean_change), list(weighted_mean_change = mean)
   )
 
-weighted_means_kinder <- my_tsibble %>%
-  group_by(inperson_bin) %>%
+weighted_means_kinder <- my_tsibble |>
+  group_by(inperson_bin) |>
   summarise(
     weighted_mean_change = weighted.mean(perc_change_kinder, enroll_all_kinder)
   )
 weighted_means_kinder <- subset(weighted_means_kinder, select = -date)
+
+
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-EnrollAll
+#| fig-cap: The weighted mean of the percent of overall district enrollment was calulated and graphed. The weights were decided on the bins which were cut in eleven sections based on share of in person school overall. 
 
 
 ##Graph
@@ -293,6 +303,15 @@ ggplot(weighted_means_all, aes(x = inperson_bin , y = weighted_mean_change)) +
   ) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 20, vjust = 1, hjust = 1, size = 6))
+```
+
+
+```{r}
+
+#| echo: false
+#| warning: false
+#| label: fig-EnrollKinder
+#| fig-cap: The weighted mean of the percent of kindergarden enrollment in all districts was calulated and graphed. The weights were decided on the bins which were cut in eleven sections based on share of in person school overall. 
 
 ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
   geom_point() +
@@ -304,8 +323,6 @@ ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
   ) +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 20, vjust = 1, hjust = 1, size = 6))
-
-
 ```
 
 # Discussion
@@ -327,6 +344,8 @@ ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
 # Appendix
 
 ```{r}
+#| echo: false
+#| warning: false
 weighted_means_all |> kable(format = "pipe", padding = 2, col.names = c("Share of inperson", "average enrollment rate"))
 ```
 

@@ -1,26 +1,23 @@
 #### Preamble ####
-# Purpose: Downloads and saves the data from [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 11 February 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
-# License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Purpose: Downloads and saves the data from https://www.openicpsr.org/openicpsr/project/193523/version/V1/view
+# Author: Sakura, Yan, Christina
+# Date: 13 February 2023
+# Contact: Sakura.noskor@mail.utoronto.ca, 
+# Pre-requisites: must download all the data sets from https://www.openicpsr.org/openicpsr/project/193523/version/V1/view?path=/openicpsr/193523/fcr:versions/V1/Raw&type=folder and save it in the inputs/data folder
 
 
 #### Workspace setup ####
-library(opendatatoronto)
+library(knitr)
+library(janitor)
 library(tidyverse)
-# [...UPDATE THIS...]
+library(readr)
+library(dplyr)
+library(tidyr)
+library(kableExtra)
+library(haven)
+library(tsibble)
+library(ggplot2)
 
-#### Download data ####
-# [...ADD CODE HERE TO DOWNLOAD...]
 
-
-
-#### Save data ####
-# [...UPDATE THIS...]
-# change the_raw_data to whatever name you assigned when you downloaded it.
-write_csv(the_raw_data, "inputs/data/raw_data.csv") 
 
          
