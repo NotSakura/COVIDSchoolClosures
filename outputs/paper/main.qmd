@@ -35,7 +35,8 @@ library(kableExtra)
 library(haven)
 library(tsibble)
 library(ggplot2)
-
+library(countrycode)
+library(lubridate)
 ```
 
 # Introduction
@@ -58,6 +59,68 @@ Some data sets cleaned were
 The graphs we made and describe the trends. Only talk abotu results not what they mean
 
 ## First Graph
+
+```{r}
+#| echo: false
+#graph 1
+covid <- read.csv("../../inputs/data/OxCGRT_compact_national_v1.csv")
+head(covid)
+#cleaning dates column
+##use as.date for expected date format, as.character to convert column to string
+covid$Date <- as.Date(as.character(covid$Date),
+                      format="%Y%m%d")
+
+#create new column for years
+covid$Year <- year(covid$Date)
+
+#filtering signifcant variables
+covid <- covid %>% 
+  select(Date, Year, CountryName, C1M_School.closing)
+
+#using package 'countrycode', create new column 'continent' that lists continent of country
+##sourcevar is input, origin tells function input is list of countries
+##origin
+covid$Continent <- countrycode(sourcevar = covid$CountryName,
+                            origin = "country.name",
+                            destination = "continent")
+
+covid <- filter(covid, !is.na(Continent))
+covid<- covid %>% group_by(Year)
+```
+
+As the original paper has divided the countries by Region, this paper has divided the countries by continent, to compare and contrast the findings based on the separation of the countries. 
+
+The original paper states that in their findings, the United States had longer terms of school closures, while given by the graph I have produced, it seems 
+
+
+```{r}
+#| echo: false
+#| warning: false
+
+#graph 2
+
+covid_summary <- covid %>%
+  group_by(Year, Continent) %>%
+  summarise(Total_School_Closings = sum(C1M_School.closing, na.rm = TRUE))
+
+#reordering in descending order
+covid_summary$Continent <- reorder(covid_summary$Continent, -covid_summary$Total_School_Closings)
+
+#
+ggplot(covid_summary, aes(x = Continent, y = Total_School_Closings, fill = Continent)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(x = "Continent", y = "Total School Closings",
+       title = "Total School Closings by Continent")
+
+ggplot(covid_summary, aes(x = Continent, y = Total_School_Closings, fill = Continent)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  facet_wrap(~Year) +
+  labs(x = "Continent", y = "Total School Closings",
+       title = "Total School Closings by Continent")
+```
+
 
 ##Second Graph
 
