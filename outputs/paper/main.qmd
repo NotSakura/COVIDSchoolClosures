@@ -2,6 +2,25 @@
 title: "COVIDSchoolClosures"
 author: "Christina, Yan, Sakura"
 format: pdf
+date: 02/12/2024
+date-format: long
+thanks: "Code and some data from this paper are available at: https://github.com/NotSakura/COVIDSchoolClosures.git"
+format: pdf
+classoption: abstract
+abstract: |
+  COVID-19 was an outbreak of virus that forced many instituations to shut down for 2-3 years. Schools were no different and this paper aims to look at the effects of the said closures in school and how it affected the population. This paper finds that with more inperson schooling provided the less the enrollment rates drop(more in depth analysis in later sections). 
+include-in-header: 
+  text:
+    \renewcommand{\abstractname}{Abstract}
+bibliography: ref.bib
+toc: true
+toc-depth: 3
+number-sections: true
+margins:
+  top: 0.5in
+  bottom: 0.5in
+  left: 0.5in
+  right: 0.5in
 ---
 ```{r}
 #| echo: false
@@ -53,6 +72,7 @@ The graphs we made and describe the trends. Only talk abotu results not what the
 
 ## Third Graph
 ```{r}
+#| echo: false
 ## Only run once cause super big data which will slow down
 raw_d <- read_dta("../../inputs/data/nces_district_enrollment_2018_2020.dta")
 other_raw <- read_csv("../../inputs/data/District_Overall_Shares.csv")
@@ -118,12 +138,16 @@ colnames(data_final) <- c("year", "leaid",
 data$leaid <- as.numeric(data$leaid)
 other_raw$leaid <- as.numeric(other_raw$leaid)
 
+write_csv(x = data_final,
+          file = "../data/cleaned_raw_data.csv")
 
 
 # Link data with another dataset (replace 'other_data' with your actual dataset)
 # Assuming 'leaid' is the common identifier
 merged_data <- merge(data_final, other_raw, by = "leaid")
 
+write_csv(x = merged_data,
+          file = "../data/merged_data.csv")
 
 # Get additional variables (share_inperson, share_hybrid, share_virtual)
 # from the linked dataset 
