@@ -130,6 +130,7 @@ ggplot(covid_summary, aes(x = Continent, y = Total_School_Closings, fill = Conti
 ```{r, fig.align='center', fig.cap = "Average Grade Change by In Person Attendence"}
 
 #| echo: false
+#| warning: false
 
 score_data = read_csv("../../inputs/data/scores_lm_demographics.csv")
 
