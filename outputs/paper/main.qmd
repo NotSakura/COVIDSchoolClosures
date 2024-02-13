@@ -1,6 +1,6 @@
 ---
 title: "COVIDSchoolClosures"
-author: "Christina, Yan, Sakura"
+author: "Cristina Burca, Yan, Sakura"
 format: pdf
 date: 02/12/2024
 date-format: long
@@ -45,14 +45,17 @@ The outcomes of this paper are that there is an over all increase in the percent
 
 # Data
 
-## Data Source and Collection //Methodology
+## Data Source and Collection
 
 We use @citeR to make this paper as well as the graphs and topic were taken inspiration from @CovidPaper. Various helpful packages were used in order to clean, sort and graph this paper in a way such that the reader will not have difficulty undertsnading neither the topic nor the data sets of this paper. The packages are, @Ggplot2, @tidyverse, @rDplyr, @rReadr, @rknitr, @rJanitor, @rExtra, @rTidyr, @rHaven, @rTissible.
 
-## Data Cleaning
+## Data Cleaning / Methodology
 
 What data set did we clean and why. Explain the variable here too ig The data provided originally was called nces
 Some data sets cleaned were 
+
+
+The paper's third set of graphs represnt percent change in enrollment by share of in-person offering by distric
 
 # Results
 
@@ -229,7 +232,6 @@ data <- raw_d |>
   filter(grade == 0 | grade == 99) |>
   filter(race == 99)
 
-
 data <- subset(data, select = -race)
 
 # Drop observations where enrollment is less than 0
@@ -377,6 +379,7 @@ weighted_means_all$inperson_bin <- as.numeric(sub(".*,", "", sub("\\]", "", weig
 ggplot(weighted_means_all, aes(x = inperson_bin , y = weighted_mean_change)) +
   geom_point() +
   geom_smooth(formula = y ~ x, method=lm, se=FALSE)+
+  scale_y_continuous(breaks = seq(-0.12, 0.05, by = 0.02), limits = c(-0.12, 0.05))+
   labs(
     title = "Percent Change in Overall District Enrollment, Fall 2019-Fall 2020",
     x = "Share of School Year with In-Person Learning Offered, 2020-2021",
@@ -386,17 +389,16 @@ ggplot(weighted_means_all, aes(x = inperson_bin , y = weighted_mean_change)) +
   theme(axis.text.x = element_text(angle = 20, vjust = 1, hjust = 1, size = 6))
 
 ```
-First, we take a look at the overall enrollment through out the districts. We can see that some values are in the negatives like the [0.364, 0.455] bin. This means that when the share of in-person school is at most 45.5% the enrollemnt rate is -0.0105% (Value found in the appendix)
+First, we take a look at the overall enrollment through out the districts. We can see that most values are in the negatives with one value in the positives in the [0.545, 0.6360] bin. We however see an upward trend signifying that we have a a positive change in the percent of rate of change. This means that the enrollment rate increases with more shares of the district going inperson. 
 
 
 
 
 ```{r}
-
 #| echo: false
 #| warning: false
 #| label: fig-EnrollKinder
-#| fig-cap: The weighted mean of the percent of kindergarden enrollment in all districts was calulated and graphed. The weights were decided on the bins which were cut in eleven sections based on share of in person school overall. 
+#| fig-cap: The weighted mean of the percent of kindergarden enrollment in all districts was calulated and graphed. The weights were decided on the bins which were cut in eleven sections based on share of in person school overall.  
 
 weighted_means_kinder$inperson_bin <- as.numeric(sub(".*,", "", sub("\\]", "", weighted_means_all$inperson_bin)))
 
@@ -404,6 +406,7 @@ weighted_means_kinder$inperson_bin <- as.numeric(sub(".*,", "", sub("\\]", "", w
 ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
   geom_point() + 
   geom_smooth(formula = y ~ x, method=lm, se=FALSE)+
+  scale_y_continuous(breaks = seq(-0.12, 0.05, by = 0.02), limits = c(-0.12, 0.05))+
   labs(
     title = "Percent Change in Kindergarten Enrollment, Fall 2019-Fall 2020",
     x = "Share of School Year with In-Person Learning Offered, 2020-2021",
