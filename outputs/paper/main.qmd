@@ -50,7 +50,7 @@ library(ggplot2)
  
 ## Data Cleaning
 What data set did we clean and why. Explain the variable here too ig
-
+The data provided originally was called nces
 
 
 # Results
@@ -83,7 +83,7 @@ other_raw$leaid <- as.character(other_raw$leaid)
 
 
 ```{r}
-
+#| echo: false
 data <- raw_d |>
   filter(grade == 0 | grade == 99) |>
   filter(race == 99)
@@ -152,7 +152,8 @@ merged_data$date <- as.Date(paste0(merged_data$year, "-01-01"))
 
 
 my_tsibble <- as_tsibble(merged_data, key = leaid, index = date)
-
+my_tsibble <- my_tsibble %>%
+  filter(year >= 2020)
 
 # Assuming you have a tsibble called my_tsibble with appropriate columns
 
@@ -185,6 +186,7 @@ my_tsibble <- my_tsibble %>%
 my_tsibble <- my_tsibble %>%
   filter(abs(change_kinder) <= enroll_all_total)
 
+
 my_tsibble <- my_tsibble %>%
   mutate(inperson_bin = cut(share_inperson, breaks = 11))
 
@@ -194,7 +196,12 @@ weighted_means_all <- my_tsibble %>%
   summarise(
     weighted_mean_change = weighted.mean(perc_change_all, enroll_all_total)
   )
+
 weighted_means_all <- subset(weighted_means_all, select = -date)
+weighted_means_all <- weighted_means_all %>%
+  group_by(inperson_bin) %>%
+  summarise_at(vars(weighted_mean_change), list(weighted_mean_change = mean)
+  )
 
 weighted_means_kinder <- my_tsibble %>%
   group_by(inperson_bin) %>%
@@ -207,21 +214,25 @@ weighted_means_kinder <- subset(weighted_means_kinder, select = -date)
 ##Graph
 ggplot(weighted_means_all, aes(x = inperson_bin , y = weighted_mean_change)) +
   geom_point() +
+  scale_y_continuous(breaks = seq(-0.2, 1.0, by = 0.2), limits = c(-0.2, 0.2))+
   labs(
     title = "Percent Change in Overall District Enrollment, Fall 2019-Fall 2020",
     x = "Share of School Year with In-Person Learning Offered, 2020-2021",
     y = "Percent Change in Enrollment"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 20, vjust = 1, hjust = 1, size = 6))
 
 ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
   geom_point() +
+  scale_y_continuous(breaks = seq(-0.2, 1.0, by = 0.2), limits = c(-0.2, 0.2))+
   labs(
     title = "Percent Change in Kindergarten Enrollment, Fall 2019-Fall 2020",
     x = "Share of School Year with In-Person Learning Offered, 2020-2021",
     y = "Percent Change in Enrollment"
   ) +
-  theme_minimal()
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 20, vjust = 1, hjust = 1, size = 6))
 
 
 ```
