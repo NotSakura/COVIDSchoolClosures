@@ -3,6 +3,27 @@ title: "COVIDSchoolClosures"
 author: "Christina, Yan, Sakura"
 format: pdf
 ---
+```{r}
+#| echo: false
+#| include: false
+#| warning: false
+#| message: false
+
+library(knitr)
+library(janitor)
+library(tidyverse)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(kableExtra)
+library(haven)
+library(tsibble)
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+```
+
 # Introduction
 
 
@@ -30,7 +51,161 @@ The graphs we made and describe the trends. Only talk abotu results not what the
 
 
 
-## Thirds Graph
+## Third Graph
+```{r}
+## Only run once cause super big data which will slow down
+raw_d <- read_dta("../../inputs/data/nces_district_enrollment_2018_2020.dta")
+other_raw <- read_csv("../../inputs/data/District_Overall_Shares.csv")
+other_raw <- other_raw|>
+  rename(leaid = "NCESDistrictID")
+other_raw$leaid <- as.character(other_raw$leaid)
+```
+
+
+
+
+
+```{r}
+
+data <- raw_d |>
+  filter(grade == 0 | grade == 99) |>
+  filter(race == 99)
+
+
+data <- subset(data, select = -race)
+
+# Drop observations where enrollment is less than 0
+data <- data[data$enrollment >= 0, ]
+
+# Drop observations where fips is greater than 56
+data <- data[data$fips <= 56, ]
+
+data <- data %>%
+  filter(!is.na(sex))
+
+
+# Reshape 'enrollment' wide by 'leaid', 'year', and 'grade'
+data_wide <- pivot_wider(data,
+                            names_from = sex,
+                            values_from = enrollment) |>
+  rename(
+    enrollment1 = `1`,
+    enrollment2 = `2`,
+    enrollment9 = `9`,
+    enrollment99 = `99`)
+
+# Drop the 'enrollment9' variable
+data_wide$enrollment9 <- NULL
+
+# Drop observations where 'enrollment99' is missing or less than or equal to 0
+data_wide <- data_wide[!is.na(data_wide$enrollment99) & data_wide$enrollment99 > 0, ]
+
+# Reshape 'enrollment1', 'enrollment2', and 'enrollment99' wide by 'leaid' and 'year'
+data_final <- pivot_wider(data_wide,
+                            names_from = grade,
+                            values_from = c(enrollment1, enrollment2, enrollment99))
+# Can get rid of fips
+
+data_final <- subset(data_final, select = -fips)
+
+# Rename columns
+colnames(data_final) <- c("year", "leaid", 
+                              "enroll_male_kinder", "enroll_female_kinder", 
+                              "enroll_male_total", "enroll_female_total", 
+                              "enroll_all_kinder", "enroll_all_total")
+
+# Convert 'leaid' to numeric (assuming it's a string)
+data$leaid <- as.numeric(data$leaid)
+other_raw$leaid <- as.numeric(other_raw$leaid)
+
+
+
+# Link data with another dataset (replace 'other_data' with your actual dataset)
+# Assuming 'leaid' is the common identifier
+merged_data <- merge(data_final, other_raw, by = "leaid")
+
+
+# Get additional variables (share_inperson, share_hybrid, share_virtual)
+# from the linked dataset 
+selected_vars <- linked_data[, c("share_inperson", "share_hybrid", "share_virtual")]
+
+# Assuming 'year' is numeric (e.g., 2019, 2020)
+merged_data$date <- as.Date(paste0(merged_data$year, "-01-01"))
+
+
+my_tsibble <- as_tsibble(merged_data, key = leaid, index = date)
+
+
+# Assuming you have a tsibble called my_tsibble with appropriate columns
+
+# Calculate change_kinder
+my_tsibble <- my_tsibble %>%
+  mutate(change_kinder = enroll_all_kinder - lag(enroll_all_kinder),
+         perc_change_kinder = change_kinder / lag(enroll_all_kinder))
+
+# Calculate change_all
+my_tsibble <- my_tsibble %>%
+  mutate(change_all = enroll_all_total - lag(enroll_all_total),
+         perc_change_all = change_all / lag(enroll_all_total))
+
+# Calculate change_male
+my_tsibble <- my_tsibble %>%
+  mutate(change_male = enroll_male_kinder - lag(enroll_male_kinder),
+         perc_change_male = change_male / lag(enroll_male_kinder))
+
+# Calculate change_female
+my_tsibble <- my_tsibble %>%
+  mutate(change_female = enroll_female_kinder - lag(enroll_female_kinder),
+         perc_change_female = change_female / lag(enroll_female_kinder))
+
+
+# Drop rows where absolute change_all is greater than enroll_all_total
+my_tsibble <- my_tsibble %>%
+  filter(abs(change_all) <= enroll_all_total)
+
+# Drop rows where absolute change_kinder is greater than enroll_all_total
+my_tsibble <- my_tsibble %>%
+  filter(abs(change_kinder) <= enroll_all_total)
+
+my_tsibble <- my_tsibble %>%
+  mutate(inperson_bin = cut(share_inperson, breaks = 11))
+
+# Compute weighted mean change in enrollment for each bin
+weighted_means_all <- my_tsibble %>%
+  group_by(inperson_bin) %>%
+  summarise(
+    weighted_mean_change = weighted.mean(perc_change_all, enroll_all_total)
+  )
+
+weighted_means_kinder <- my_tsibble %>%
+  group_by(inperson_bin) %>%
+  summarise(
+    weighted_mean_change = weighted.mean(perc_change_kinder, enroll_all_kinder)
+  )
+
+
+##Graph
+ggplot(weighted_means, aes(x = inperson_bin , y = weighted_mean_change)) +
+  geom_point() +
+  labs(
+    title = "Percent Change in Overall District Enrollment, Fall 2019-Fall 2020",
+    x = "Share of School Year with In-Person Learning Offered, 2020-2021",
+    y = "Percent Change in Enrollment"
+  ) +
+  theme_minimal()
+
+ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
+  geom_point() +
+  labs(
+    title = "Percent Change in Kindergarten Enrollment, Fall 2019-Fall 2020",
+    x = "Share of School Year with In-Person Learning Offered, 2020-2021",
+    y = "Percent Change in Enrollment"
+  ) +
+  theme_minimal()
+
+
+```
+
 
 
 # Discussion
@@ -41,6 +216,7 @@ The graphs we made and describe the trends. Only talk abotu results not what the
 ##Intreesting point 2
 
 ## interesting point 3
+
 
 
 ##Ethics and Bias
