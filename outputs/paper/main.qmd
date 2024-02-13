@@ -19,8 +19,6 @@ margins:
   right: 0.5in
 ---
 
-
-
 ```{r}
 #| echo: false
 #| include: false
@@ -42,32 +40,109 @@ library(ggplot2)
 
 # Introduction
 
-
 # Data
 
 ## Data Source and Collection //Methodology
-  We use @citeR to make this paper as well as the graphs and topic were taken inspiration from @CovidPaper. Various helpful packages were used in order to clean, sort and graph this paper in a way such that the reader will not have difficulty undertsnading neither the topic nor the data sets of this paper. The packages are, @Ggplot2, @tidyverse, @rDplyr, @rReadr, @rknitr, @rJanitor, @rExtra, @rTidyr, @rHaven, @rTissible. 
- 
-## Data Cleaning
-What data set did we clean and why. Explain the variable here too ig
-The data provided originally was called nces
 
+We use @citeR to make this paper as well as the graphs and topic were taken inspiration from @CovidPaper. Various helpful packages were used in order to clean, sort and graph this paper in a way such that the reader will not have difficulty undertsnading neither the topic nor the data sets of this paper. The packages are, @Ggplot2, @tidyverse, @rDplyr, @rReadr, @rknitr, @rJanitor, @rExtra, @rTidyr, @rHaven, @rTissible.
+
+## Data Cleaning
+
+What data set did we clean and why. Explain the variable here too ig The data provided originally was called nces
 
 # Results
+
 The graphs we made and describe the trends. Only talk abotu results not what they mean
-
-
 
 ## First Graph
 
-
-
-
 ##Second Graph
 
+```{r, fig.align='center', fig.cap = "Average Grade Change by In Person Attendence"}
 
+#| echo: false
+
+score_data = read_csv("../../inputs/data/scores_lm_demographics.csv")
+
+
+clean_score_data_inperson <- score_data %>%
+  select(subject, change_2017_2018, change_2018_2019, change_2019_2021, change_2021_2022, share_inperson, urban_centric_locale) %>%
+  rename_with(~ sub("^change_(\\d{4})_(\\d{4})$", "Spring_\\2", .), starts_with("change")) %>%
+  mutate(share_inperson_grouped = cut(share_inperson * 100, breaks = seq(0, 100, by = 25), include.lowest = TRUE, right = FALSE, labels = c("0-25", "25-50", "50-75", "75-100")))
+
+# Pivot the data to a long format
+score_data_long_inperson <- clean_score_data_inperson %>%
+  pivot_longer(cols = starts_with("Spring"), names_to = "time_period", values_to = "change_score")
+
+# Group by 'subject', 'share_inperson_grouped', and 'time_period', then summarize
+score_data_summary_inperson <- score_data_long_inperson %>%
+  group_by(subject, share_inperson_grouped, time_period) %>%
+  summarise(
+    mean_change = mean(change_score, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+# Now prepare data for the 'urban_centric_locale' grouping
+score_data_long_locale <- clean_score_data_inperson %>%
+  pivot_longer(cols = starts_with("Spring"), names_to = "time_period", values_to = "change_score")
+
+# Group by 'subject', 'urban_centric_locale', and 'time_period', then summarize
+score_data_summary_locale <- score_data_long_locale %>%
+  group_by(subject, urban_centric_locale, time_period) %>%
+  summarise(
+    mean_change = mean(change_score, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+ggplot(score_data_summary_inperson, aes(y = share_inperson_grouped, x = round(mean_change * 100), color = time_period)) +
+  geom_point(position = position_dodge(width = 0.2)) +
+  scale_x_continuous(limits = c(-15, 5), breaks = seq(-15, 5, by = 5)) +
+  labs(
+    title = "Average Grade Change by In Person Attendence",
+    y = "In-Person Share Group (%)",
+    x = "Average Change Score (%)",
+    color = "Time Period" 
+  ) +
+  scale_color_brewer(palette = "Set1", labels = c("Spring 2018", "Spring 2019", "Spring 2021", "Spring 2022")) + # Custom labels
+  theme_minimal() +
+  theme(
+    legend.position = "bottom", 
+    legend.background = element_rect(fill = "white", size = 0.3, linetype = "solid"),
+    legend.text = element_text(size = 8),
+    legend.title = element_text(size = 10, face = "bold"),
+    legend.key.size = unit(0.2, "cm")
+  ) +
+  facet_wrap(~subject)
+
+
+```
+
+```{r, fig.align='center', fig.cap = "Average Score Change by Geographic Locale"}
+#| echo: false
+# Plot for 'urban_centric_locale'
+ggplot(score_data_summary_locale, aes(y = urban_centric_locale, x = round(mean_change * 100), color = time_period)) +
+  geom_point(position = position_dodge(width = 0.1)) +
+  scale_x_continuous(limits = c(-15, 5), breaks = seq(-15, 5, by = 5)) +
+  labs(
+    title = "Average Score Change by Geographic Locale",
+    y = "Urban Centric Locale",
+    x = "Average Change Score (%)",
+    color = "Time Period" 
+  ) +
+  scale_color_brewer(palette = "Set1", labels = c("Spring 2018", "Spring 2019", "Spring 2021", "Spring 2022")) + # Custom labels for time periods
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    legend.background = element_rect(fill = "white", size = 0.5, linetype = "solid"),
+    legend.text = element_text(size = 8), 
+    legend.title = element_text(size = 10, face = "bold"), 
+    legend.key.size = unit(0.2, "cm")
+  ) +
+  facet_wrap(~subject)
+```
 
 ## Third Graph
+
 ```{r}
 #| echo: false
 ## Only run once cause super big data which will slow down
@@ -77,10 +152,6 @@ other_raw <- other_raw|>
   rename(leaid = "NCESDistrictID")
 other_raw$leaid <- as.character(other_raw$leaid)
 ```
-
-
-
-
 
 ```{r}
 #| echo: false
@@ -237,38 +308,26 @@ ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
 
 ```
 
-
-
 # Discussion
 
 ## Interesting point 1
 
-
 ## Intresting point 2
-
 
 ## interesting point 3
 
-
-
-##Ethics and Bias
-could talk about mental health maybe but it might apply to other "interesting point"
+##Ethics and Bias could talk about mental health maybe but it might apply to other "interesting point"
 
 ## weakness and limitations
 
-
 ## how to solve the limitations
-
 
 ## Furthur questions?
 
-
 # Appendix
+
 ```{r}
 weighted_means_all |> kable(format = "pipe", padding = 2, col.names = c("Share of inperson", "average enrollment rate"))
 ```
 
-
-
 # Reference
-
