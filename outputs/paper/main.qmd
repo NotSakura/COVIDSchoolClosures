@@ -4,7 +4,7 @@ author: "Cristina Burca, Yan, Sakura"
 format: pdf
 date: 02/12/2024
 date-format: long
-thanks: "Code and some data from this paper are available at: https://github.com/NotSakura/COVIDSchoolClosures.git"
+thanks: "Code and some data from this paper are available at: [github repo](https://github.com/NotSakura/COVIDSchoolClosures.git)"
 classoption: abstract
 abstract: |
   COVID-19 was an outbreak of virus that forced many instituations to shut down for 2-3 years. Schools were no different and this paper aims to look at the effects of the said closures in school and how it affected the population. This paper finds that with more inperson schooling provided the less the enrollment rates drop(more in depth analysis in later sections). 
