@@ -63,9 +63,9 @@ The graphs we made and describe the trends. Only talk abotu results not what the
 
 ```{r}
 #| echo: false
-#graph 1
+#| include: false
+
 covid <- read.csv("../../inputs/data/OxCGRT_compact_national_v1.csv")
-head(covid)
 #cleaning dates column
 ##use as.date for expected date format, as.character to convert column to string
 covid$Date <- as.Date(as.character(covid$Date),
@@ -162,7 +162,7 @@ score_data_summary_locale <- score_data_long_locale |>
 
 ggplot(score_data_summary_inperson, aes(y = share_inperson_grouped, x = round(mean_change * 100), color = time_period)) +
   geom_point(position = position_dodge(width = 0.2)) +
-  scale_x_continuous(limits = c(-15, 5), breaks = seq(-15, 5, by = 5)) +
+  scale_x_continuous(limits = c(-15, 10), breaks = seq(-15, 5, by = 10)) +
   labs(
     title = "Average Grade Change by In Person Attendence",
     y = "In-Person Share Group (%)",
@@ -184,7 +184,11 @@ ggplot(score_data_summary_inperson, aes(y = share_inperson_grouped, x = round(me
 ```
 
 ```{r, fig.align='center', fig.cap = "Average Score Change by Geographic Locale"}
+
 #| echo: false
+#| warning: false
+
+
 # Plot for 'urban_centric_locale'
 ggplot(score_data_summary_locale, aes(y = urban_centric_locale, x = round(mean_change * 100), color = time_period)) +
   geom_point(position = position_dodge(width = 0.1)) +
