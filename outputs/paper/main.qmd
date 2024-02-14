@@ -41,7 +41,7 @@ library(lubridate)
 
 # Introduction
 
-The outcomes of this paper are that there is an over all increase in the percent of enrollment as more in person schools are opened in the educational districts of United States. The concept fo educational districts will be described later in the data section for the user's aid but in this context it is not the most important. 
+The outcomes of this paper are that there is an over all increase in the percent of enrollment as more in person schools are opened in the educational districts of United States. The concept fo educational districts will be described later in the data section for the user's aid but in this context it is not the most important.
 
 # Data
 
@@ -51,9 +51,7 @@ We use @citeR to make this paper as well as the graphs and topic were taken insp
 
 ## Data Cleaning / Methodology
 
-What data set did we clean and why. Explain the variable here too ig The data provided originally was called nces
-Some data sets cleaned were 
-
+What data set did we clean and why. Explain the variable here too ig The data provided originally was called nces Some data sets cleaned were
 
 The paper's third set of graphs represnt percent change in enrollment by share of in-person offering by distric
 
@@ -91,10 +89,9 @@ covid <- filter(covid, !is.na(Continent))
 covid<- covid %>% group_by(Year)
 ```
 
-As the original paper has divided the countries by Region, this paper has divided the countries by continent, to compare and contrast the findings based on the separation of the countries. 
+As the original paper has divided the countries by Region, this paper has divided the countries by continent, to compare and contrast the findings based on the separation of the countries.
 
-The original paper states that in their findings, the United States had longer terms of school closures, while given by the graph I have produced, it seems 
-
+The original paper states that in their findings, the United States had longer terms of school closures, while given by the graph I have produced, it seems
 
 ```{r}
 #| echo: false
@@ -124,8 +121,7 @@ ggplot(covid_summary, aes(x = Continent, y = Total_School_Closings, fill = Conti
        title = "Total School Closings by Continent")
 ```
 
-
-##Second Graph
+## Second Graph
 
 ```{r, fig.align='center', fig.cap = "Average Grade Change by In Person Attendence"}
 
@@ -212,8 +208,8 @@ ggplot(score_data_summary_locale, aes(y = urban_centric_locale, x = round(mean_c
 ```
 
 ## Third Graph
-It is no secret that COVID-19 affected the school enrollment rates, when the students were forced to learn in a virtual environment. In this section the paper will uncover any trends in enrollment rates with relation to the number of in-person learning offered in each district.
 
+It is no secret that COVID-19 affected the school enrollment rates, when the students were forced to learn in a virtual environment. In this section the paper will uncover any trends in enrollment rates with relation to the number of in-person learning offered in each district.
 
 ```{r}
 #| echo: false
@@ -390,10 +386,8 @@ ggplot(weighted_means_all, aes(x = inperson_bin , y = weighted_mean_change)) +
   theme(axis.text.x = element_text(angle = 20, vjust = 1, hjust = 1, size = 6))
 
 ```
-First, we take a look at the overall enrollment through out the districts. We can see that most values are in the negatives with one value in the positives in the [0.545, 0.6360] bin. We however see an upward trend signifying that we have a a positive change in the percent of rate of change. This means that the enrollment rate increases with more shares of the district going inperson. 
 
-
-
+First, we take a look at the overall enrollment through out the districts. We can see that most values are in the negatives with one value in the positives in the \[0.545, 0.6360\] bin. We however see an upward trend signifying that we have a a positive change in the percent of rate of change. This means that the enrollment rate increases with more shares of the district going inperson.
 
 ```{r}
 #| echo: false
@@ -424,7 +418,8 @@ ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
 ## Intresting point 2
 
 ## Change in enrollment rate in kindergarden vs all
-The third set of graphs that were shown in the results section was graphs that showed the change in enrollment with the shares of in-person school that started (@fig-EnrollAll, @fig-EnrollKinder). As discussed in the section it seemed like the overall trend of the graph was that enrollment rates were higher the more in-person school there was. This was seen in both cases but more predominantly in the kindergarten graph (@fig-EnrollKinder). This result was interesing as this shows with younger ages the enrollment rates being higher means the children enjoy going to school in person. This is important as kindergarten is when most children start developing the fundamental socila skills required to interact with other people. 
+
+The third set of graphs that were shown in the results section was graphs that showed the change in enrollment with the shares of in-person school that started (@fig-EnrollAll, @fig-EnrollKinder). As discussed in the section it seemed like the overall trend of the graph was that enrollment rates were higher the more in-person school there was. This was seen in both cases but more predominantly in the kindergarten graph (@fig-EnrollKinder). This result was interesing as this shows with younger ages the enrollment rates being higher means the children enjoy going to school in person. This is important as kindergarten is when most children start developing the fundamental socila skills required to interact with other people.
 
 ## Ethics and Bias could talk about mental health maybe but it might apply to other "interesting point"
 
