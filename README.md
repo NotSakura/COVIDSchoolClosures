@@ -2,7 +2,7 @@
 
 ## Abstract
 
- COVID-19 was an outbreak of virus that forced many instituations to shut down for 2-3 years. Schools were no different and this paper aims to look at the effects of the said closures in school and how it affected the students. This paper's initial focus is on the golbal student population, where it finds that there were multiple days of school closed during covid, but shifts its focus to the US where it finds that the standardised test scores has also been affected. Other results was that with more inperson schooling provided the less the enrollment rates drop(more in depth analysis in later sections). 
+ COVID-19 was an outbreak of a virus that forced many institutions to shut down for 2-3 years. Schools were no different and this paper aims to look at the effects of the said closures in school and how it affected the students. This paper's initial focus is on the global student population, where it finds that there were multiple days of school closed during covid, but shifts its focus to the US where it finds that the standardized test scores have also been affected. Other results was that with more in-person schooling provided the less the enrollment rates dropped (more in-depth analysis in later sections). 
 
 
 ## LLM Usage: 
