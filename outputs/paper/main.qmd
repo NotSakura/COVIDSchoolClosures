@@ -139,7 +139,7 @@ ggplot(covid_summary, aes(x = Continent, y = Total_School_Closings, fill = Conti
 Here we will look at the change in percentage of test score of students between the years of 2017 and 2022. Covid-19 had a major impact on student test scores, whether it be because of the quality of remote learning or the resources the students may have or not have had while learning remotely. the first of the two figures is a near identical replication of the the on in the original paper we are replicating while the second figure is gives us some additional information to analyze that wasn't examined as thoroughly in the orginal paper.
 
 
-```{r, fig.align='center'}
+```{r}
 #| include: false
 #| echo: false
 #| warning: false
@@ -205,7 +205,7 @@ The first observation that can be made is the percent change in test score betwe
 
 
 
-```{r, fig.align='center'}
+```{r}
 #| include: false
 #| echo: false
 #| warning: false
