@@ -16,7 +16,9 @@ Cristina's LLM link: https://sl.bing.net/jiK8LujwuLA , https://sl.bing.net/fnlrK
 
 The repo is structured as:
 
--   `input/data` contains the data sources used in analysis including the raw data. These were also obtained from https://www.openicpsr.org/openicpsr/project/193523/version/V1/view?path=/openicpsr/193523/fcr:versions/V1/Raw&type=folder 
+-   `input/data` contains the data sources used in analysis including the raw data. These were also obtained from https://www.openicpsr.org/openicpsr/project/193523/version/V1/view?path=/openicpsr/193523/fcr:versions/V1/Raw&type=folder
+-   `input/sketches` contains the initial sketches
+-   `input/llm` contains the llm text documentation for all members.
 -   `outputs/data` contains the cleaned dataset that was constructed.
 -    `outputs/figures` contains that graphs that are the main points of our paper. 
 -   `outputs/paper` contains the files used to generate the paper, including the Quarto document and reference bibliography file, as well as the PDF of the paper. 
