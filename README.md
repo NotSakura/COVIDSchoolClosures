@@ -9,6 +9,8 @@ To use this folder, click the green "Code" button", then "Download ZIP". Move th
 
 ##LLM Usage: Chatgpt was used as our generative ai to help with definitions, error codes and exceptional cases in our code when, the textbook provided or the internet didn't provide answers.
 Sakura's LLM link: https://chat.openai.com/share/365f06fb-9947-4f21-af7a-5f49f956c269 
+Yan's LLM link: https://chat.openai.com/g/g-TgjKDuQwZ-r-wizard
+
 
 ## File Structure
 
