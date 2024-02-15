@@ -140,7 +140,7 @@ Here we will look at the change in percentage of test score of students between 
 
 
 ```{r, fig.align='center'}
-
+#| include: false
 #| echo: false
 #| warning: false
 #| label: fig-InPersonAttendence
@@ -206,7 +206,7 @@ The first observation that can be made is the percent change in test score betwe
 
 
 ```{r, fig.align='center'}
-
+#| include: false
 #| echo: false
 #| warning: false
 #| label: fig-GeoLocale
