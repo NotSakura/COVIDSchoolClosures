@@ -1,10 +1,6 @@
 ---
 title: "COVID School Closures and Their Impact on Students"
-<<<<<<< HEAD
 author: "Cristina Burca, Yan Mezhiborsky, Sakura Noskor"
-=======
-author: "Cristina Burca, Yan B. Mezhiborsky, Sakura"
->>>>>>> cc5671c5ca1423620234eea34918dd30fa422491
 format: pdf
 date: 02/12/2024
 date-format: long
@@ -144,12 +140,7 @@ ggplot(covid_summary, aes(x = Continent, y = Total_School_Closings, fill = Conti
 Here we will look at the change in percentage of test score of students between the years of 2017 and 2022. Covid-19 had a major impact on student test scores, whether it be because of the quality of remote learning or the resources the students may have or not have had while learning remotely. the first of the two figures is a near identical replication of the the on in the original paper we are replicating while the second figure is gives us some additional information to analyze that wasn't examined as thoroughly in the original paper.
 
 
-<<<<<<< HEAD
 ```{r, fig.align='center'}
-=======
-```{r}
-#| include: false
->>>>>>> cc5671c5ca1423620234eea34918dd30fa422491
 #| echo: false
 #| warning: false
 #| label: fig-InPersonAttendence
@@ -214,12 +205,7 @@ The first observation that can be made is the percent change in test score betwe
 
 
 
-<<<<<<< HEAD
 ```{r, fig.align='center'}
-=======
-```{r}
-#| include: false
->>>>>>> cc5671c5ca1423620234eea34918dd30fa422491
 #| echo: false
 #| warning: false
 #| label: fig-GeoLocale
@@ -561,6 +547,12 @@ In the near identical Replication of the graph in the original paper(@fig-InPers
 ## Change in enrollment rate in kindergarden vs all
 
 The third set of graphs that were shown in the results section was graphs that showed the change in enrollment with the shares of in-person school that started (@fig-EnrollAll, @fig-EnrollKinder). As discussed in the section it seemed like the overall trend of the graph was that enrollment rates were higher the more in-person school there was. This was seen in both cases but more predominantly in the kindergarten graph (@fig-EnrollKinder). This result was interesting as this shows with younger ages the enrollment rates being higher means the children enjoy going to school in person. This is important as kindergarten is when most children start developing the fundamental social skills required to interact with other people.
+
+The graph @fig-Enroll2019 also shows the share of in-person schooling vs the enrollment rates and the result is that the enrollment rate is a lot higher then the rate for 2020 however, the over all trend stays the same. The rates are slightly higher meaning that in 2019 the enrollment rate was decreasing but not by the magnitude it was decreasing at in 2020. This shows that COVID-19 greatly affected the students, to the point where some students may have dropped out. This comparison can be supported by the fact that during COVID-19 the mental health of young adults decreased by a large amounts. This result was cited in the orginal paper as well, where they state the NCES reported an "accelerated decrease in youth mental health levels" [@CovidPaper]. There were no other factors that would greatly influence the results shown in these 2 figures [@fig-Enroll2019 and @fig-EnrollAll] other then the limitation of social interactions during the pandemic. 
+
+Lastly is the comparison between having a in person class and virtual class. If it wasn't clear from the previous three graphs (@fig-EnrollAll, @fig-EnrollKinder and @fig-Enroll2019) that in-person learning results in higher enrollment rates, the negative correlation with virtual environment does. In @fig-EnrollVirtual we see that the line of best fit is negative compared to the previous graphs. This means that as more schools went virtual the more the enrollment rates dropped. This supports the papers hypothesis that students are more willing to learn in a environment where they are able to physically interact with people. Part of this might be due to the fact that a lot of students, when in person feel more inclined to work harder as the task they are doing is not as easy to ignore compared to a virtual environment where they can simply log off. 
+
+In both of these comparisons, it can be seen that the major cause to the trends seen in the graphs shown above is social interactions or the lack there of during the pandemic. What is left to learn is what to do with such data. The reason why this is so interesting was that during this time there was no other options but to put the students on lock down to stop the spread of the disease but it came at the great cost of the future and the mental health of the students. The interesting thing was the towards the end of the pandemic, educators seemed to notice the gradual decrease in enrollment and saw the correlation with social interactions. Hence many different programs were implemented so that students don't feel the gap in the interactions. Some of the measures taken were putting students on a zoom call with the camera's turned on or allowing guidance support from the school. 
 
 ## Ethics and Bias
   Some of the ethical concerns of this research is the idea of consent. All of this data is publicaly available so, it is more important that consent is gathered when performing these surveys. Other ethical concerns lie in the area of having the choice of in-person vs virtual schooling. Although this paper shows that in-person schooling has allowed a better enrollment rate and such, however that does not necessarily mean that students were doing better in-person. many studies during the pandemic found that course average had been either very high due to the fact that classes were taken online and students had the flexibility required to maintain a proper school-life balance but on the other hand other districts saw lower averages as the district school board would decide to test on harder material to fight against the real possibility of plagiarism during virtual school. Plagiarism is another big ethics topic to cover when talking about virtual school as attending a school online makes it very difficult for educators to monitor every students move and take action again every academic offence case that comes up. This leads to a difficult question for policy makers on whether they allow the virtual school format with stricter rules to combat such offence or to come up with a better more relaxed approach where students aren't restricted by the fear of accidentally commiting plagiarism. 
