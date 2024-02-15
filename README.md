@@ -9,7 +9,7 @@
 Chatgpt was used as our generative ai to help with definitions, error codes and exceptional cases in our code when, the textbook provided or the internet didn't provide answers.
 Sakura's LLM link: https://chat.openai.com/share/365f06fb-9947-4f21-af7a-5f49f956c269 
 Yan's LLM link: https://chat.openai.com/g/g-TgjKDuQwZ-r-wizard
-Cristina's LLM link: https://sl.bing.net/jiK8LujwuLA , https://www.bing.com/search?q=change+x-axis+labels+to+integers+in+ggplot&qs=ds&form=ATCVAJ&showconv=1
+Cristina's LLM link: https://sl.bing.net/jiK8LujwuLA , https://sl.bing.net/fnlrKQyyKke
 
 
 ## File Structure
