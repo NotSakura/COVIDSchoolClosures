@@ -1,5 +1,5 @@
 ---
-title: "COVIDSchoolClosures"
+title: "COVID School Closures and Their Impact on Students"
 author: "Cristina Burca, Yan, Sakura"
 format: pdf
 date: 02/12/2024
@@ -53,11 +53,17 @@ We use @citeR to make this paper as well as the graphs and topic were taken insp
 
 What data set did we clean and why. Explain the variable here too ig The data provided originally was called nces Some data sets cleaned were
 
-The paper's third set of graphs represnt percent change in enrollment by share of in-person offering by distric
+The paper's third set of graphs represnt percent change in enrollment by share of in-person offering by district
+The third set of graphs shown in this paper is the enrollment rates in the different educational districts of the US. 
+
+## Measurment
+
+
+As mentioned before the third claim that this paper looks at is the enrollment rates with respect to the share of in-person learning or virtual learning. For this category there are 2 measurements. The data originally come with the number of enrollments in each leaid for each year however, the data is cleaned up so the reader may see the rates related to it. The x-axis show the share of in-person or virtual schools in the district. The share of in-person was only changed in terms of how this paper binned the data; the share value was from 0 to 100% and it was cut into 11 equal pieces. The measurement for the x-axis is the same as it is on the raw datasheet, which is percentage representing share of districts that were either in-person or virtual, values from 0 to 100%. The measurement for the y axis is the enrollment rate. This has been changed from the raw data set as originally it recorded the number of students enrolled for each grade by leaid for a certain year. As mentioned in the methodology, the original value was changed into a rate then a percentage to better show the reader what the actual changes were. If this step was not done then comparing the declines and the inclines of enrollment rate would have been hard due to the large numbers. Anyhow, the measurement for the y-axis is the enrollment rate in percentage and it doesn't have a limit. 
 
 # Results
 
-The graphs we made and describe the trends. Only talk abotu results not what they mean
+The graphs we made and describe the trends. Only talk about results not what they mean
 
 ## First Graph
 
@@ -211,9 +217,9 @@ ggplot(score_data_summary_locale, aes(y = urban_centric_locale, x = round(mean_c
   facet_wrap(~subject)
 ```
 
-## Third Graph
+## Enrollment rate in the US
 
-It is no secret that COVID-19 affected the school enrollment rates, when the students were forced to learn in a virtual environment. In this section the paper will uncover any trends in enrollment rates with relation to the number of in-person learning offered in each district.
+It is no secret that COVID-19 affected the school enrollment rates, when the students were forced to learn in a virtual environment. In this section the paper will uncover any trends in enrollment rates with relation to the number of in-person learning offered in each district. For all of the graphs below the y axis will be from -0.12 to 0.05 to ensure reader us able to comapre the trends right beside each other.
 
 ```{r}
 #| echo: false
@@ -335,10 +341,41 @@ my_tsibble <- my_tsibble |>
   filter(abs(change_kinder) <= enroll_all_kinder)
 
 
+virtual_tsibble <- my_tsibble |>
+  mutate(virtual_bin = cut(share_virtual, breaks = 11))
 my_tsibble <- my_tsibble |>
   mutate(inperson_bin = cut(share_inperson, breaks = 11))
+
+
+# get the different enrollment rates for different years
+enrollment_rate_2019 <- my_tsibble |>
+  filter(year >= 2019)
 my_tsibble <- my_tsibble |>
   filter(year >= 2020)
+virtual_tsibble <- virtual_tsibble |>
+  filter(year >= 2020)
+
+
+# get the mean enrollment rate for 2019
+mean_enroll_2019_all <- enrollment_rate_2019 |>
+  group_by(inperson_bin) |>
+  summarise(
+    weighted_mean_change = weighted.mean(perc_change_all, enroll_all_total)
+  )
+
+mean_enroll_2019_all <- subset(mean_enroll_2019_all, select = -date)
+mean_enroll_2019_all <- mean_enroll_2019_all |>
+  group_by(inperson_bin) |>
+  summarise_at(vars(weighted_mean_change), list(weighted_mean_change = mean)
+  )
+
+# get the mean enrollment rate for 2020 but virtual this time
+virtual_2020_mean <- virtual_tsibble |>
+  group_by(virtual_bin) |>
+  summarise(
+    weighted_mean_change = weighted.mean(perc_change_all, enroll_all_total)
+  )
+virtual_2020_mean <- subset(virtual_2020_mean, select = -date)
 
 
 # Compute weighted mean change in enrollment for each bin
@@ -364,6 +401,8 @@ weighted_means_kinder <- subset(weighted_means_kinder, select = -date)
 
 ```
 
+
+
 ```{r}
 #| echo: false
 #| warning: false
@@ -377,7 +416,7 @@ weighted_means_all$inperson_bin <- as.numeric(sub(".*,", "", sub("\\]", "", weig
 
 
 
-ggplot(weighted_means_all, aes(x = inperson_bin , y = weighted_mean_change)) +
+g <- ggplot(weighted_means_all, aes(x = inperson_bin , y = weighted_mean_change)) +
   geom_point() +
   geom_smooth(formula = y ~ x, method=lm, se=FALSE)+
   scale_y_continuous(breaks = seq(-0.12, 0.05, by = 0.02), limits = c(-0.12, 0.05))+
@@ -389,9 +428,12 @@ ggplot(weighted_means_all, aes(x = inperson_bin , y = weighted_mean_change)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 20, vjust = 1, hjust = 1, size = 6))
 
+ggsave(filename = "../figures/InpersonAll.png", plot = g, width = 6, height = 4)
+g
+
 ```
 
-First, we take a look at the overall enrollment through out the districts. We can see that most values are in the negatives with one value in the positives in the \[0.545, 0.6360\] bin. We however see an upward trend signifying that we have a a positive change in the percent of rate of change. This means that the enrollment rate increases with more shares of the district going inperson.
+First, we take a look at the overall enrollment through out the districts. We can see that most values are in the negatives with one value in the positives in the \[0.545, 0.6360\] bin. We however see an upward trend signifying that we have a a positive change in the percent of rate of change. This means that the enrollment rate increases with more shares of the district going in person. Diving in deeper to look at the values (provided in the Appendix).The graph shows that for 0% to 9% of in-person schooling, we have a decrease of 3% in the enrollment rate. For 9% to 55% share or in person schooling, the rate of enrollment is around -35% meaning there is  decrease of 35% and the rate goes to 4% increase in enrollment rate for 55% to 64% of in person schooling in the district. Then the value drops to 1% decrease in enrollment rate when the share of in person offered is 73% to 64% approximately. Then it jumps to a 2% decrease in enrollment then it levels out to 1% decrease in enrollment rate for the last 73% to 100% share in in-person learning. The overall trend is increasing but there are brief moments of decreasing enrollment rates. 
 
 ```{r}
 #| echo: false
@@ -402,7 +444,7 @@ First, we take a look at the overall enrollment through out the districts. We ca
 weighted_means_kinder$inperson_bin <- as.numeric(sub(".*,", "", sub("\\]", "", weighted_means_all$inperson_bin)))
 
 
-ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
+g <- ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
   geom_point() + 
   geom_smooth(formula = y ~ x, method=lm, se=FALSE)+
   scale_y_continuous(breaks = seq(-0.12, 0.05, by = 0.02), limits = c(-0.12, 0.05))+
@@ -413,7 +455,66 @@ ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
   ) +
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 20, vjust = 1, hjust = 1, size = 6))
+
+ggsave(filename = "../figures/InpersonKinder.png", plot = g, width = 6, height = 4)
+g
 ```
+In comparison we look at the kindergarten enrollment in the same year. Looking at the values individually, the graph shows that for the initial shares 9%, 18% and 27%, we get an enrollment rate of kindergartners in the US is -9%, -10% and 10% respectively. They all show decreasing enrollment rate. The for the 36% of in-person schooling we get a 8.4% enrollment rate and there is a decrease of 9.4% and 8.2% in enrollment rate when there is 45% and 55% share of in person school respectively, for kindergartens. Then the enrollment rates increase to -3.2% and 7% for the proceeding 64% and 73% of in person school share. Afterwards there is a decrease 4.8% in enrollment rates when 82% of schools are in person. Then there is another decrease to -2.4% in enrollment rate when there is 91% share of in person rates. And lastly for 91% to 100% of the in person shares the enrollment rates are -3.9%. This means that although the enrollment rates are negative for the most part there is an increasing trend. This means that the enrollment rates were increasing as more kindergartners were attending in person. Also compared to @fig-EnrollAll, the slope of the line of best fit is steeper meaning that the rate of increas in enrollment rates is higher. More on the reason to be discussed in later sections. 
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-Enroll2019
+#| fig-cap: The weighted mean of the percent of total enrollment in 2019 accross all districts was calulated and graphed. The weights were decided on the bins which were cut in eleven sections based on share of in person school overall.  
+
+mean_enroll_2019_all$inperson_bin <- as.numeric(sub(".*,", "", sub("\\]", "", mean_enroll_2019_all$inperson_bin)))
+
+
+g <- ggplot(mean_enroll_2019_all, aes(x = inperson_bin, y = weighted_mean_change)) +
+  geom_point() + 
+  geom_smooth(formula = y ~ x, method=lm, se=FALSE)+
+  scale_y_continuous(breaks = seq(-0.12, 0.05, by = 0.02), limits = c(-0.12, 0.05))+
+  labs(
+    title = "Percent Change in Overall Enrollment, Fall 2018-Fall 2019",
+    x = "Share of School Year with In-Person Learning Offered, 2019-2020",
+    y = "Percent Change in Enrollment"
+  ) +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 20, vjust = 1, hjust = 1, size = 6))
+
+ggsave(filename = "../figures/InpersonAll2019.png", plot = g, width = 6, height = 4)
+g
+```
+
+The purpose of this paper is to compare and analyse the outcomes of the school closures during the pandemic to better understand the impact of it. To see the comparison, this paper also analyses the enrollment rate in 2019. The graph shows that the initial 9% share of in-person school has a decrease of 1% in enrollment.These values stay relatively the same - hovering around the -0.10% to -0.019% enrollment rate- until the 55% to 64% share of in-person school where the enrollment rate jumps to 0.02. Then in the 73th percentile, we see a decrease to -1% in enrollment rate but the procceeding values even out to approximatly 0$ (or more specifically 0.001% and 0.004%). Although the values are negative for the large portion of the graph, there is still an upward trend we saw in previous graphs where the more proprtion of in-person schooling, the larger the enrollment rate. 
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-EnrollVirtual
+#| fig-cap: The weighted mean of the percent of total enrollment in 2020 accross all districts was calulated and graphed. The weights were decided on the bins which were cut in eleven sections based on share of virtual school overall.  
+
+virtual_2020_mean$virtual_bin <- as.numeric(sub(".*,", "", sub("\\]", "", virtual_2020_mean$virtual_bin)))
+
+
+g <- ggplot(virtual_2020_mean, aes(x = virtual_bin, y = weighted_mean_change)) +
+  geom_point() + 
+  geom_smooth(formula = y ~ x, method=lm, se=FALSE)+
+  scale_y_continuous(breaks = seq(-0.12, 0.05, by = 0.02), limits = c(-0.12, 0.05))+
+  labs(
+    title = "Percent Change in Overall Enrollment, Fall 2019-Fall 2020",
+    x = "Share of School Year with Virtual Learning Offered, 2020-2021",
+    y = "Percent Change in Enrollment"
+  ) +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 20, vjust = 1, hjust = 1, size = 6))
+
+ggsave(filename = "../figures/VirtualAll.png", plot = g, width = 6, height = 4)
+g
+```
+
+Lastly, in order to properly make a conclusion about enrollment rates and in-person schooling the reader must also see the opposite correlation, hence the paper looks at the enrollment rates for share of virtual learning as well, above. The graphs shows that for the first 9% of schools doing virtual learning in the districts have a enrollment rate of -2%, which increase to approximately -3% in the 18% share of virtual school. Then the value jumps up to the maximum value in the entire graph at 0.001% decrease in enrollment rate when 18% to 27% of schools are virtual. Then for the shares from 27% to 72% we see that the enrollment rate fluctuates between 3.1 to 3.7% decrease in enrollment rate where the change is so small the difference is not changing the graph at all. Finally we see a slight increase in enrollment rate with -2.8% and then proceeding with an even higher enrollment rate of -1.9% for 90% and 100% share of virtual school respectively. Looking at the graph overall, the line of best fit seems to have a negative slop compared to the line of best fit computed for the other graphs. 
+
 
 # Discussion
 
@@ -423,22 +524,52 @@ ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
 
 ## Change in enrollment rate in kindergarden vs all
 
-The third set of graphs that were shown in the results section was graphs that showed the change in enrollment with the shares of in-person school that started (@fig-EnrollAll, @fig-EnrollKinder). As discussed in the section it seemed like the overall trend of the graph was that enrollment rates were higher the more in-person school there was. This was seen in both cases but more predominantly in the kindergarten graph (@fig-EnrollKinder). This result was interesing as this shows with younger ages the enrollment rates being higher means the children enjoy going to school in person. This is important as kindergarten is when most children start developing the fundamental socila skills required to interact with other people.
+The third set of graphs that were shown in the results section was graphs that showed the change in enrollment with the shares of in-person school that started (@fig-EnrollAll, @fig-EnrollKinder). As discussed in the section it seemed like the overall trend of the graph was that enrollment rates were higher the more in-person school there was. This was seen in both cases but more predominantly in the kindergarten graph (@fig-EnrollKinder). This result was interesting as this shows with younger ages the enrollment rates being higher means the children enjoy going to school in person. This is important as kindergarten is when most children start developing the fundamental social skills required to interact with other people.
 
 ## Ethics and Bias could talk about mental health maybe but it might apply to other "interesting point"
 
+
 ## weakness and limitations
+Do our own part (how to solve it!)
 
-## how to solve the limitations
 
-## Furthur questions?
+## Furthur research 
+
+
 
 # Appendix
 
 ```{r}
 #| echo: false
 #| warning: false
-weighted_means_all |> kable(format = "pipe", padding = 2, col.names = c("Share of inperson", "average enrollment rate"))
+#| label: tbl-InperAll
+#| tbl-cap: Enrollment rates throughout all districts in the U.S. 2020 catagorized by share of inperson learning
+weighted_means_all |> kable(format = "pipe", padding = 2, col.names = c("Share of inperson", "average total enrollment rate"))
 ```
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: tbl-KinderAll
+#| tbl-cap: Enrollment rates for kindergartners throughout all districts in the U.S. 2020 catagorized by share of inperson learning
+weighted_means_kinder |> kable(format = "pipe", padding = 2, col.names = c("Share of inperson", "average kindergarten enrollment rate"))
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: tbl-InperAll19
+#| tbl-cap: Enrollment rates throughout all districts in the U.S. 2019 catagorized by share of inperson learning
+mean_enroll_2019_all |> kable(format = "pipe", padding = 2, col.names = c("Share of inperson", "average enrollment rate"))
+```
+
+```{r}
+#| echo: false
+#| warning: false
+#| label: tbl-VirtAll
+#| tbl-cap: Enrollment rates throughout all districts in the U.S. 2020 catagorized by share of virtual learning
+virtual_2020_mean |> kable(format = "pipe", padding = 2, col.names = c("Share of virtual", "average enrollment rate"))
+```
+
 
 # Reference
