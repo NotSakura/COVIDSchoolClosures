@@ -192,7 +192,7 @@ ggplot(score_data_summary_inperson, aes(y = share_inperson_grouped, x = round(me
 # Plot for 'urban_centric_locale'
 ggplot(score_data_summary_locale, aes(y = urban_centric_locale, x = round(mean_change * 100), color = time_period)) +
   geom_point(position = position_dodge(width = 0.1)) +
-  scale_x_continuous(limits = c(-15, 5), breaks = seq(-15, 5, by = 5)) +
+  scale_x_continuous(limits = c(-15, 10), breaks = seq(-15, 10, by = 5)) +
   labs(
     title = "Average Score Change by Geographic Locale",
     y = "Urban Centric Locale",
