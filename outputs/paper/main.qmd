@@ -56,23 +56,20 @@ We use @citeR to make this paper as well as the graphs and topic were taken insp
 
 What data set did we clean and why. Explain the variable here too ig The data provided originally was called nces Some data sets cleaned were
 
-<<<<<<< HEAD
+
 The paper's third set of graphs represnt percent change in enrollment by share of in-person offering by district
 The third set of graphs shown in this paper is the enrollment rates in the different educational districts of the US. 
 
 ## Measurment
-
-
-As mentioned before the third claim that this paper looks at is the enrollment rates with respect to the share of in-person learning or virtual learning. For this category there are 2 measurements. The data originally come with the number of enrollments in each leaid for each year however, the data is cleaned up so the reader may see the rates related to it. The x-axis show the share of in-person or virtual schools in the district. The share of in-person was only changed in terms of how this paper binned the data; the share value was from 0 to 100% and it was cut into 11 equal pieces. The measurement for the x-axis is the same as it is on the raw datasheet, which is percentage representing share of districts that were either in-person or virtual, values from 0 to 100%. The measurement for the y axis is the enrollment rate. This has been changed from the raw data set as originally it recorded the number of students enrolled for each grade by leaid for a certain year. As mentioned in the methodology, the original value was changed into a rate then a percentage to better show the reader what the actual changes were. If this step was not done then comparing the declines and the inclines of enrollment rate would have been hard due to the large numbers. Anyhow, the measurement for the y-axis is the enrollment rate in percentage and it doesn't have a limit. 
-=======
 The second set of this paper's graphs focused on test scores of students in the United States of America, specifically their score changes in ELA(English Language Arts) and Mathematics. The data this was compared to was the percentage of in person attendance as well as the geographic locale of the students.
 
-The paper's third set of graphs represnt percent change in enrollment by share of in-person offering by distric
->>>>>>> e2c3f074fa9ffeff8d924cafe97845b1d3a68ebc
+As mentioned before the third claim that this paper looks at is the enrollment rates with respect to the share of in-person learning or virtual learning. For this category there are 2 measurements. The data originally come with the number of enrollments in each leaid for each year however, the data is cleaned up so the reader may see the rates related to it. The x-axis show the share of in-person or virtual schools in the district. The share of in-person was only changed in terms of how this paper binned the data; the share value was from 0 to 100% and it was cut into 11 equal pieces. The measurement for the x-axis is the same as it is on the raw datasheet, which is percentage representing share of districts that were either in-person or virtual, values from 0 to 100%. The measurement for the y axis is the enrollment rate. This has been changed from the raw data set as originally it recorded the number of students enrolled for each grade by leaid for a certain year. As mentioned in the methodology, the original value was changed into a rate then a percentage to better show the reader what the actual changes were. If this step was not done then comparing the declines and the inclines of enrollment rate would have been hard due to the large numbers. Anyhow, the measurement for the y-axis is the enrollment rate in percentage and it doesn't have a limit. 
+
+
+
 
 # Results
 
-The graphs we made and describe the trends. Only talk about results not what they mean
 
 ## First Graph
 
@@ -237,14 +234,11 @@ ggplot(score_data_summary_locale, aes(y = urban_centric_locale, x = round(mean_c
   facet_wrap(~subject)
 ```
 
-<<<<<<< HEAD
-## Enrollment rate in the US
-=======
+
+
 Here we will look at the Geographic Locales of students, and how their grade have changed based on what type of municipality they live in. We can observe that Cities and suburbs of all sizes both in Math and ELA Scores. This may be due to a variety of reasons among them the Covid-19 in each of the specific localities. As cities are densely populated they are more likely to have had stricter lock down rules during the outbreak of Covid-19. Furthermore, suburbs are usually near cities and would likely have similar lock down rules to the cities they are near.
 
-## Third Graph
->>>>>>> e2c3f074fa9ffeff8d924cafe97845b1d3a68ebc
-
+## Enrollment rate in the US
 It is no secret that COVID-19 affected the school enrollment rates, when the students were forced to learn in a virtual environment. In this section the paper will uncover any trends in enrollment rates with relation to the number of in-person learning offered in each district. For all of the graphs below the y axis will be from -0.12 to 0.05 to ensure reader us able to comapre the trends right beside each other.
 
 ```{r}
@@ -557,27 +551,17 @@ The third set of graphs that were shown in the results section was graphs that s
 ## Ethics and Bias could talk about mental health maybe but it might apply to other "interesting point"
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> e2c3f074fa9ffeff8d924cafe97845b1d3a68ebc
 ## weakness and limitations
 Do our own part (how to solve it!)
 
 
 ## Furthur research 
-
-<<<<<<< HEAD
-
-=======
 As stated previously we do not have data for the test scores in 2023, which could give us additional information about how the pandemic affected students grades, as well as the younger students who were in elementary and middle schools when the pandemic began and how their educational foundations may have been affected.
 
 ## how to solve the limitations
-
 Furthermore, the best way to see the how test scores would change would be to wait several years and analyze the data that would be collected after a few ages complete these tests. While in the short term the test scores of Spring 2023 would be benefitial information to have before making any more conclusions than we have.
 
 ## Furthur questions?
->>>>>>> e2c3f074fa9ffeff8d924cafe97845b1d3a68ebc
 
 # Appendix
 
