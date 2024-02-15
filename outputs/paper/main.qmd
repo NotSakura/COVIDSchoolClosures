@@ -55,7 +55,18 @@ We use @citeR to make this paper as well as the graphs and topic were taken insp
 
 ## Data Cleaning / Methodology
 
-What data set did we clean and why. Explain the variable here too ig The data provided originally was called nces Some data sets cleaned were
+  The first set of graphs introduced in this paper analyze the number of school closures by
+continent and by country due to the Covid-19 stay-at-home restrictions that took effect from the
+beginning of 2020 to the beginning of 2022, varying by country. The variables considered from
+the dataset are Date, Year, Country, School.Closing, and Continent. To explain the variables,
+Date is written in the format YYYY-MM-DD, Year was created to assist with data manipulating,
+Country lists the Country name, School.Closing lists an integer value of 0 if countries’s
+institutions were open on the listed date, and 1 if they were closed.
+  The data is organized in sequential order from January 1st, 2020 to December 31st,
+2022. It was cleaned by firstly selecting the variables of interest and creating the Year column
+derived from Date to allow for comparison by year. The package @rCountrycode was used to
+create a new column that categorizes the continent the country is in. Data from the original
+paper was organized and presented under a different list of continents.
 
 
   The third set of graphs shown in this paper is the enrollment rates in the different educational districts of the US.The original data provided was from US department of Education through NCES (National Institute for Education Statistics). The variables included were year, leaid, fips, grade, race, sex, and enrollment. Starting by defining the variables, leaid stands for local education agency id number. This allows the NCES to identify the districts with their unique id code. Next is fips, which stands for federal information processing standards. This number is a rate/level given by the US government to a specific district which essentially rates the technological security of each district (@fipsDef). The grade essentially says the grade the students are in from 0-12 to 99 where 0 is kindergarten and 99 is representing the total enrollment for all grades. The dataset was also made through another raw data set from COVID School Data Hub [@CSDH] which contains different abbreviations and id numbers corresponding to each district, including leaid, and they also have the share of in-person, virtual and hybrid schools open in that district. The share of in-person school represents the amount of schools that were in_person in that district. Similar explanations for virtual and hybrid shares. 
@@ -63,6 +74,16 @@ What data set did we clean and why. Explain the variable here too ig The data pr
   The process of cleaning this raw data was simple. First, we look at the NCES data. Since the paper only looks at enrollment rates for all grades and kindergartners, a filter is applied for grade to be 0 or 99 with another filter of race to be 99 as 99 represents all. Then another filter is applied where, the data only contains fips that has a value less than 56 as there are only 56 levels in fips.  Then the entire data is transformed into a wide format where the new following new columns appear: enrollment for males, enrollment for females, enrollment for all (Not the real names). There are other columns like enrollment9 that gets created but it is dropped as there are no values contained within it. Then the values of enrollment for all columns are filtered such that if they contain an invalid value or such as not available or 0, then the entire row is deleted. After that, the entire data is again reshaped such that we get rid of the grades columns and have new columns as such; enrollment for males in total, enrollment for females in total, enrollment for males in kindergarten, enrollment for females in kindergarten, enrollment for both gender in total, enrollment for both gender in kindergarten. So currently have the rows listed before, the year, and the leaid. Then the current data is merged with the other raw data provided by COVID School Data Hub[@CSDH]. They were merged based on the leaid and any access columns such as NCES id or state id was deleted as it was of no use to the paper. Then the computations begin. In order to find the rate of enrollment, the formula was to subtract the previous value from the current and divide by the previous value. So for example to find the enrollment rate for males that attend in-person, the `lag()` of enrollment for males in total was taken and subtracted to it self and stored in a variable called changeTotal. Then the changeTotal variable was divided again by the lag of "enrollment for males in total" column. This was repeated for all the columns that had the enrollment values for each subcategory. This value was then binned according to the share in-person column or the share virtual column based on the graph that was produced. However this was not enough as there were many points, to the point where the analysis of that data set was not worth anything and hence, per guidance to the original paper, a weighted mean was taken. An ordinary average was not taken as this some states would have higher in-person rates then others which would mean there are outliars in this case. So an ordinary average function would have lost some of the important trends we see when we take a weighted average. 
 
 ## Measurment
+
+The first set of graphs introduced in this paper analyze the number of school closures per year
+from 2020 to 2022. The data originally included a figure displaying the average number of days
+with School Closed, by Region, from January 2020 to December 2021, with the Regions of
+Sub-Saharan Africa, Europe and Central Asia, East Asia and Pacific, Middle East and North
+Africa, Latin America and Caribbean, South Asia, and North America. This paper instead
+analyzed the number of school closures per year by continent, including the year 2022.
+Moreover, since this paper focuses on data from the United States, the second graph examines
+data from the United States in comparison with other various countries.
+
 The second set of this paper's graphs focused on test scores of students in the United States of America, specifically their score changes in ELA(English Language Arts) and Mathematics. The data this was compared to was the percentage of in person attendance as well as the geographic locale of the students.
 
 As mentioned before the third claim that this paper looks at is the enrollment rates with respect to the share of in-person learning or virtual learning. For this category there are 2 measurements. The data originally come with the number of enrollments in each leaid for each year however, the data is cleaned up so the reader may see the rates related to it. The x-axis show the share of in-person or virtual schools in the district. The share of in-person was only changed in terms of how this paper binned the data; the share value was from 0 to 100% and it was cut into 11 equal pieces. The measurement for the x-axis is the same as it is on the raw datasheet, which is percentage representing share of districts that were either in-person or virtual, values from 0 to 100%. The measurement for the y axis is the enrollment rate. This has been changed from the raw data set as originally it recorded the number of students enrolled for each grade by leaid for a certain year. As mentioned in the methodology, the original value was changed into a rate then a percentage to better show the reader what the actual changes were. If this step was not done then comparing the declines and the inclines of enrollment rate would have been hard due to the large numbers. Anyhow, the measurement for the y-axis is the enrollment rate in percentage and it doesn't have a limit. 
@@ -74,66 +95,126 @@ As mentioned before the third claim that this paper looks at is the enrollment r
 
 
 ## First Graph
-
 ```{r}
 #| echo: false
-#| include: false
-
+#| warning: false
+#| include: true
 covid <- read.csv("../../inputs/data/OxCGRT_compact_national_v1.csv")
 #cleaning dates column
 ##use as.date for expected date format, as.character to convert column to string
 covid$Date <- as.Date(as.character(covid$Date),
-                      format="%Y%m%d")
-
+format="%Y%m%d")
 #create new column for years
 covid$Year <- year(covid$Date)
-
 #filtering signifcant variables
-covid <- covid %>% 
-  select(Date, Year, CountryName, C1M_School.closing)
-
+covid <- covid %>%
+select(Date, Year, CountryName, C1M_School.closing)
 #using package 'countrycode', create new column 'continent' that lists continent of country
 ##sourcevar is input, origin tells function input is list of countries
 ##origin
 covid$Continent <- countrycode(sourcevar = covid$CountryName,
-                            origin = "country.name",
-                            destination = "continent")
-
+origin = "country.name",
+destination = "continent")
+covid <- filter(covid, !is.na(Continent))
+covid<- covid %>% group_by(Year)
+```
+As global stay-at-home orders were enforced due to Covid-19 saftey mandates in the beginning
+of 2020, the number of elementary schools regulated to transition to virtual learning increased
+rapidly. In this section, we will explore general trends of the total school closures across the
+world from 2020 to 2022, categorized by continent. Furthermore, we will investigate school
+closures trends over the years of the United States in comparison with other countries.
+```{r, fig.height=4, fig.width=7}
+#| echo: false
+#| warning: false
+#| message: false
+#| label: fig-Continents
+#| fig-cap: Number of school closures per Contient per year
+covid_summary <- covid %>%
+group_by(Year, Continent) %>%
+summarise(Total_School_Closings = sum(as.numeric(C1M_School.closing),
+na.rm = TRUE))
+#reordering in descending order
+covid_summary$Continent <- reorder(covid_summary$Continent,
+-covid_summary$Total_School_Closings)
+ggplot(covid_summary, aes(x = Continent,
+y = Total_School_Closings)) +
+geom_bar(stat = "identity") +
+theme_minimal() +
+theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+facet_wrap(~Year) +
+labs(x = "Continent", y = "Total School Closings")
 covid <- filter(covid, !is.na(Continent))
 covid<- covid %>% group_by(Year)
 ```
 
-As the original paper has divided the countries by Region, this paper has divided the countries by continent, to compare and contrast the findings based on the separation of the countries.
-
-The original paper states that in their findings, the United States had longer terms of school closures, while given by the graph I have produced, it seems
-
-```{r}
+In @fig-Continents, we graph the total number of schools closing due to Covid-19 safety
+mandates and alternated to remote learning by continent, for years 2020 to 2022. Note that the
+data for South America and North America are combined under the catagory 'Americas'.
+We notice some evident features; Asia has the overall largest number of school closures, this
+can attribute to a larger population compared to other continents, or a greater number of
+schools relative to the population. All continents experienced a correspondent decline in the
+number of school closures each year, apart from Africa. Although this may be compelling to
+investigate further, this is not relevant to this paper. Let us explore the overall decline in school
+closings between the years 2020 and 2021 in @tbl-Percents.
+```{r, fig.height=3, fig.width=5}
 #| echo: false
-#| warning: false
-
-#graph 2
-
-covid_summary <- covid %>%
-  group_by(Year, Continent) %>%
-  summarise(Total_School_Closings = sum(C1M_School.closing, na.rm = TRUE))
-
-#reordering in descending order
-covid_summary$Continent <- reorder(covid_summary$Continent, -covid_summary$Total_School_Closings)
-
-#
-ggplot(covid_summary, aes(x = Continent, y = Total_School_Closings, fill = Continent)) +
-  geom_bar(stat = "identity") +
-  theme_minimal() +
-  labs(x = "Continent", y = "Total School Closings",
-       title = "Total School Closings by Continent")
-
-ggplot(covid_summary, aes(x = Continent, y = Total_School_Closings, fill = Continent)) +
-  geom_bar(stat = "identity") +
-  theme_minimal() +
-  facet_wrap(~Year) +
-  labs(x = "Continent", y = "Total School Closings",
-       title = "Total School Closings by Continent")
+#| message: false
+#| label: tbl-Percents
+#| tbl-cap: Change in school closures percentage by Continent from 2020 to 2021
+covid_summary_2 <- covid_summary %>%
+arrange(Continent, Year) %>%
+group_by(Continent) %>%
+mutate(percent = (Total_School_Closings/lag(Total_School_Closings) - 1)*100)
+#remove N/A columns from years not applicable
+covid_summary_2 <- covid_summary_2 %>%
+filter(!is.na(percent)) %>%
+filter(Year == '2021')
+covid_summary_2$percent <- as.numeric(covid_summary_2$percent)
+covid_summary_2$percent <- round(covid_summary_2$percent, digits = 2)
+# Remove NA values generated by the lag function for the first year of each continent
+covid_summary_2 <- covid_summary_2 %>%
+filter(!is.na(percent))
+kable(covid_summary_2,
+col.names = c("Year", "Continent", "# of Closings", "Percent"))
 ```
+The data across the continents, with the exclusion of Africa, exhibited a similar decrease of
+about 13%. This could a result of the international consensus of implementation of laws in
+respect social and institutional closures. We now analyze the data pertaining to the United
+States in @fig-Countries.
+```{r, fig.height=4, fig.width=7}
+#| echo: false
+#| message: false
+#| label: fig-Countries
+#| fig-cap: Number of school closures per year by country
+countries <- covid %>%
+select(Year, Date, CountryName, C1M_School.closing) %>%
+filter(CountryName == "United States"|CountryName == 'Canada'|CountryName ==
+'India'|CountryName == 'Brazil'|CountryName == 'Australia'|CountryName ==
+'Germany'|CountryName == 'Nigeria')
+#create new column
+countries <- countries %>%
+mutate(school_closed = as.numeric(C1M_School.closing != 0))
+covid_summary_2 <- countries %>%
+group_by(Year, CountryName) %>%
+summarise(Total_School_Closings = sum(school_closed, na.rm = TRUE))
+#create bar grpah to compare number of days closed
+ggplot(covid_summary_2, aes(x = Year,
+y = Total_School_Closings,
+fill = CountryName)) +
+geom_bar(stat = "identity", position = "dodge", width = 0.6) +
+scale_x_continuous(breaks = 2020:2022) +
+theme_minimal() +
+labs(x = "Year", y = "Total School Closings", fill = 'Country')
+```
+I have chosen to show the number of school closures per year with a list of countries for
+comparison with the United States. Australia, Brazil, Germany, India, and Turkey were chosen
+due to their standing as some of the most populated cities representing each continent, and
+Canada for standard of comparison. Evidently, we observe that the United States experienced
+national school closures for the entirety of 2021,2022, and majority of 2020. This is in
+comparison to the alternate countries, which collectively exhibited a significant decrease in
+school closures in 2022, when Covid-19 restrictions were officially ceased. Notably, students in
+the United States were compelled to learn in a remote environment for a much longer term than
+other countries
 
 ## Second Graph
 
@@ -423,7 +504,7 @@ weighted_means_kinder <- subset(weighted_means_kinder, select = -date)
 
 
 
-```{r}
+```{r, fig.height=4, fig.width=7}
 #| echo: false
 #| warning: false
 #| label: fig-EnrollAll
@@ -455,7 +536,7 @@ g
 
 First, we take a look at the overall enrollment through out the districts. We can see that most values are in the negatives with one value in the positives in the \[0.545, 0.6360\] bin. We however see an upward trend signifying that we have a a positive change in the percent of rate of change. This means that the enrollment rate increases with more shares of the district going in person. Diving in deeper to look at the values (provided in the Appendix).The graph shows that for 0% to 9% of in-person schooling, we have a decrease of 3% in the enrollment rate. For 9% to 55% share or in person schooling, the rate of enrollment is around -35% meaning there is  decrease of 35% and the rate goes to 4% increase in enrollment rate for 55% to 64% of in person schooling in the district. Then the value drops to 1% decrease in enrollment rate when the share of in person offered is 73% to 64% approximately. Then it jumps to a 2% decrease in enrollment then it levels out to 1% decrease in enrollment rate for the last 73% to 100% share in in-person learning. The overall trend is increasing but there are brief moments of decreasing enrollment rates. 
 
-```{r}
+```{r, fig.height=4, fig.width=7}
 #| echo: false
 #| warning: false
 #| label: fig-EnrollKinder
@@ -481,7 +562,7 @@ g
 ```
 In comparison we look at the kindergarten enrollment in the same year. Looking at the values individually, the graph shows that for the initial shares 9%, 18% and 27%, we get an enrollment rate of kindergartners in the US is -9%, -10% and 10% respectively. They all show decreasing enrollment rate. The for the 36% of in-person schooling we get a 8.4% enrollment rate and there is a decrease of 9.4% and 8.2% in enrollment rate when there is 45% and 55% share of in person school respectively, for kindergartens. Then the enrollment rates increase to -3.2% and 7% for the proceeding 64% and 73% of in person school share. Afterwards there is a decrease 4.8% in enrollment rates when 82% of schools are in person. Then there is another decrease to -2.4% in enrollment rate when there is 91% share of in person rates. And lastly for 91% to 100% of the in person shares the enrollment rates are -3.9%. This means that although the enrollment rates are negative for the most part there is an increasing trend. This means that the enrollment rates were increasing as more kindergartners were attending in person. Also compared to @fig-EnrollAll, the slope of the line of best fit is steeper meaning that the rate of increas in enrollment rates is higher. More on the reason to be discussed in later sections. 
 
-```{r}
+```{r, fig.height=4, fig.width=7}
 #| echo: false
 #| warning: false
 #| label: fig-Enroll2019
@@ -508,7 +589,7 @@ g
 
 The purpose of this paper is to compare and analyse the outcomes of the school closures during the pandemic to better understand the impact of it. To see the comparison, this paper also analyses the enrollment rate in 2019. The graph shows that the initial 9% share of in-person school has a decrease of 1% in enrollment.These values stay relatively the same - hovering around the -0.10% to -0.019% enrollment rate- until the 55% to 64% share of in-person school where the enrollment rate jumps to 0.02. Then in the 73th percentile, we see a decrease to -1% in enrollment rate but the procceeding values even out to approximatly 0$ (or more specifically 0.001% and 0.004%). Although the values are negative for the large portion of the graph, there is still an upward trend we saw in previous graphs where the more proprtion of in-person schooling, the larger the enrollment rate. 
 
-```{r}
+```{r, fig.height=4, fig.width=7}
 #| echo: false
 #| warning: false
 #| label: fig-EnrollVirtual
@@ -538,40 +619,75 @@ Lastly, in order to properly make a conclusion about enrollment rates and in-per
 
 # Discussion
 
-## Interesting point 1
+## Categorization of Continents
+In the similar replication @fig-Continents of the graph Figure 2 in the original paper
+[@CovidPaper], the authors decided to analyze data spanning from January 2020 to December
+2021, excluding any data recorded from the year 2022. While this could be due to various
+reasons, it is imperative to analyze the period following the conclusion of the Covid -19
+pandemic to gain insight into the implications of school closures with no stay-at-home
+mandates.
 
 ## Change in Test Scores of 2022
 
 In the near identical Replication of the graph in the original paper(@fig-InPersonAttendence), we have included the year 2022 in the change in test scores, where the original paper failed to do so. This could could be due to a variety of reasons, among them possibly the fact that the original authors may have thought it to be unimportant, or they may have been trying to make the change in test scores to seem more permanent, as if the the virus had more long term effect. While the test scores did not increase as much as they fell, they increased never the less, although we do not have data for spring 2023, it is possible we could have made further conclusions with this additional information.
 
-## Change in enrollment rate in kindergarden vs all
+## Change in enrollment rate 
 
+### Kindergarten vs Total Enrollment
 The third set of graphs that were shown in the results section was graphs that showed the change in enrollment with the shares of in-person school that started (@fig-EnrollAll, @fig-EnrollKinder). As discussed in the section it seemed like the overall trend of the graph was that enrollment rates were higher the more in-person school there was. This was seen in both cases but more predominantly in the kindergarten graph (@fig-EnrollKinder). This result was interesting as this shows with younger ages the enrollment rates being higher means the children enjoy going to school in person. This is important as kindergarten is when most children start developing the fundamental social skills required to interact with other people.
 
+### Total Enrollment in 2020 vs Total Enrollment in 2019
 The graph @fig-Enroll2019 also shows the share of in-person schooling vs the enrollment rates and the result is that the enrollment rate is a lot higher then the rate for 2020 however, the over all trend stays the same. The rates are slightly higher meaning that in 2019 the enrollment rate was decreasing but not by the magnitude it was decreasing at in 2020. This shows that COVID-19 greatly affected the students, to the point where some students may have dropped out. This comparison can be supported by the fact that during COVID-19 the mental health of young adults decreased by a large amounts. This result was cited in the orginal paper as well, where they state the NCES reported an "accelerated decrease in youth mental health levels" [@CovidPaper]. There were no other factors that would greatly influence the results shown in these 2 figures [@fig-Enroll2019 and @fig-EnrollAll] other then the limitation of social interactions during the pandemic. 
 
-Lastly is the comparison between having a in person class and virtual class. If it wasn't clear from the previous three graphs (@fig-EnrollAll, @fig-EnrollKinder and @fig-Enroll2019) that in-person learning results in higher enrollment rates, the negative correlation with virtual environment does. In @fig-EnrollVirtual we see that the line of best fit is negative compared to the previous graphs. This means that as more schools went virtual the more the enrollment rates dropped. This supports the papers hypothesis that students are more willing to learn in a environment where they are able to physically interact with people. Part of this might be due to the fact that a lot of students, when in person feel more inclined to work harder as the task they are doing is not as easy to ignore compared to a virtual environment where they can simply log off. 
+### Total Enrollment for in-person learning vs virtual
+Last relation is the comparison between having an in person class and virtual class. If it wasn't clear from the previous three graphs (@fig-EnrollAll, @fig-EnrollKinder and @fig-Enroll2019), in-person learning results in higher increase in enrollment rates, while in this section one notices the negative correlation with virtual environment with enrollment rates. In @fig-EnrollVirtual we see that the line of best fit is negative compared to the previous graphs. This means that as more schools went virtual the larger the decrease was in the enrollment rates. This result supports the papers hypothesis that students are more willing to learn in a environment where they are able to physically interact with other people. Part of this might be due to the fact that a lot of students, when in person feel more inclined to work harder as the task they are doing is not as easy to ignore compared to a virtual environment where they can simply log off. 
 
+### Finishing Thoughts
 In both of these comparisons, it can be seen that the major cause to the trends seen in the graphs shown above is social interactions or the lack there of during the pandemic. What is left to learn is what to do with such data. The reason why this is so interesting was that during this time there was no other options but to put the students on lock down to stop the spread of the disease but it came at the great cost of the future and the mental health of the students. The interesting thing was the towards the end of the pandemic, educators seemed to notice the gradual decrease in enrollment and saw the correlation with social interactions. Hence many different programs were implemented so that students don't feel the gap in the interactions. Some of the measures taken were putting students on a zoom call with the camera's turned on or allowing guidance support from the school. 
 
 ## Ethics and Bias
-  Some of the ethical concerns of this research is the idea of consent. All of this data is publicaly available so, it is more important that consent is gathered when performing these surveys. Other ethical concerns lie in the area of having the choice of in-person vs virtual schooling. Although this paper shows that in-person schooling has allowed a better enrollment rate and such, however that does not necessarily mean that students were doing better in-person. many studies during the pandemic found that course average had been either very high due to the fact that classes were taken online and students had the flexibility required to maintain a proper school-life balance but on the other hand other districts saw lower averages as the district school board would decide to test on harder material to fight against the real possibility of plagiarism during virtual school. Plagiarism is another big ethics topic to cover when talking about virtual school as attending a school online makes it very difficult for educators to monitor every students move and take action again every academic offence case that comes up. This leads to a difficult question for policy makers on whether they allow the virtual school format with stricter rules to combat such offence or to come up with a better more relaxed approach where students aren't restricted by the fear of accidentally commiting plagiarism. 
+  Some of the ethical concerns of this research is the idea of consent. All of this data is publicly available so, it is more important that consent is gathered when performing these surveys. Other ethical concerns lie in the area of having the choice of in-person vs virtual schooling. Although this paper shows that in-person schooling has allowed a better enrollment rate and such, however that does not necessarily mean that students were doing better in-person. many studies during the pandemic found that course average had been either very high due to the fact that classes were taken online and students had the flexibility required to maintain a proper school-life balance but on the other hand other districts saw lower averages as the district school board would decide to test on harder material to fight against the real possibility of plagiarism during virtual school. Plagiarism is another big ethics topic to cover when talking about virtual school as attending a school online makes it very difficult for educators to monitor every students move and take action again every academic offence case that comes up. This leads to a difficult question for policy makers on whether they allow the virtual school format with stricter rules to combat such offence or to come up with a better more relaxed approach where students aren't restricted by the fear of accidentally commiting plagiarism. 
   
-  In terms of bias in this paper, there is a fair amount. Most of the data would not be considered bias as the data was obtained from a reputable government website which by law requires them to publish truthful data. Also the fact that the US is considered a developped country also diminishes the chance of bias in missing data from educational districts, as they are all accounted for. A possible bias could be the fact that the data only looks at the enrollment rates for grade 12 and lower where in the states this is almost mandatory. This means that change in enrollment is never due to the fact that students just stopped going to school. A possible way to combat this bias is to have the same data but for university/college students or for the workplace. This allows a more indepth analysis about the mental health issues that might surround people during the pandemic, resulting in them either having higher productivity -which would be showcased by an increase in "enrollment" as there is more virtual options- or a decrease in productivity resulting in dropping out - which would be showcased in the graph as either an increase in "enrollment" as more in-person options open up pr decrease in "enrollment" as more virtual option open up. 
+  In terms of bias in this paper, there is not a lot of it. Most of the data would not be considered bias as the data was obtained from a reputable government website which by law requires them to publish truthful data. Also the fact that the US is considered a developed country  diminishes the chance missing major data (such as the enrollment rate or test scores) from educational districts, as they are all accounted for in organised manner. A possible bias could be the fact that the data only looks at the enrollment rates for grade 12 and lower where in the states this is almost mandatory. This means that change in enrollment is never due to the fact that students just stopped going to school. A possible way to combat this bias is to have the same data but for university/college students or for the workplace. This allows a more in-depth analysis about the mental health issues that might surround people during the pandemic, resulting in them either having higher productivity -which would be showcased by an increase in "enrollment" as there is more virtual options- or a decrease in productivity resulting in dropping out - which would be showcased in the graph as either an increase in "enrollment" as more in-person options open up pr decrease in "enrollment" as more virtual option open up. 
 
 
 
-## weakness and limitations
-Do our own part (how to solve it!)
+## Weakness and Limitations
+
+### Translating code
+  One significant challenge encountered throughout this paper pertains to the translation of
+specific variables, functions, and lines of code from Stata to R. This posed difficulty due to
+differences in syntaxes and data structures. Much difficulty lied in recreating the continent
+category in @fig-Continents, as Figure 2 in the original paper is divided by criteria chosen by the
+author. In this paper, the data was categorized into continents for analysis using the package `countrycode` [@rCountrycode].
+
+  Some of the weaknesses seen in the enrollment data was that there were a lot of sections that had "NA" as a value meaning they didn't have data for that section. These values were always in the sex, grade or race column meaning that the enrollment rates were accounted for but the small data associated with it was not. This was particularly difficult during the cleaning process because when trying to extend the data by adding new columns the function `pivot_wider()` was used. Initially the plan was to use the `reshape()` function but when trying to reshape the data set while some of the columns had no value was difficult. This was due to the fact that it would make an entire row empty if this was the case. This problem was tackled using the r help book [@citeR] and was replaced with pivot_wide instead. 
+
+### Lack of Data description
+  The original file of the paper contained many data sets, all contained specific clean information
+used in various parts of the paper. However, the data does not include a description of the
+variables used or the column names. For some variables, the values were arbitrary, such as
+integer values of 0,1,9, and 99 for gender, or values 0,1,2 and 3 for school closure. With
+description of the variables, further analysis could have been conducted by the introduction of
+other variables. There were many variables such as leaid and fips, that had to be [googled](https://www.google.ca/) and searched for in order to find out what they meant as well. 
+
+
+### Solution to Limitation
+  To help with the translation and replication of code, detailed comments should be included to
+explain the functionality of code. Moreover, variables and columns with their values should be
+explained.
+  Furthermore, the best way to see the how test scores would change would be to wait several years and analyze the data that would be collected after a few ages complete these tests. While in the short term the test scores of Spring 2023 would be benefitial information to have before making any more conclusions than we have.
+
 
 
 ## Furthur research 
 As stated previously we do not have data for the test scores in 2023, which could give us additional information about how the pandemic affected students grades, as well as the younger students who were in elementary and middle schools when the pandemic began and how their educational foundations may have been affected.
+  If analyzing data specifically from the United States, it would be compelling to explore variation
+in educational foundations of children in different states, as Covid-19 restrictions were decided
+by the state government in the United States, and thus social and institutional restrictions varied
+by state.
 
-## how to solve the limitations
-Furthermore, the best way to see the how test scores would change would be to wait several years and analyze the data that would be collected after a few ages complete these tests. While in the short term the test scores of Spring 2023 would be benefitial information to have before making any more conclusions than we have.
 
-## Furthur questions?
 
 # Appendix
 
