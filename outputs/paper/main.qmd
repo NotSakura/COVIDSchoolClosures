@@ -53,6 +53,8 @@ We use @citeR to make this paper as well as the graphs and topic were taken insp
 
 What data set did we clean and why. Explain the variable here too ig The data provided originally was called nces Some data sets cleaned were
 
+The second set of this paper's graphs focused on test scores of students in the United States of America, specifically their score changes in ELA(English Language Arts) and Mathematics. The data this was compared to was the percentage of in person attendance as well as the geographic locale of the students.
+
 The paper's third set of graphs represnt percent change in enrollment by share of in-person offering by distric
 
 # Results
@@ -123,10 +125,15 @@ ggplot(covid_summary, aes(x = Continent, y = Total_School_Closings, fill = Conti
 
 ## Second Graph
 
-```{r, fig.align='center', fig.cap = "Average Grade Change by In Person Attendence"}
+Here we will look at the change in percentage of test score of students between the years of 2017 and 2022. Covid-19 had a major impact on student test scores, whether it be because of the quality of remote learning or the resources the students may have or not have had while learning remotely. the first of the two figures is a near identical replication of the the on in the original paper we are replicating while the second figure is gives us some additional information to analyze that wasn't examined as thoroughly in the orginal paper.
+
+
+```{r, fig.align='center'}
 
 #| echo: false
 #| warning: false
+#| label: fig-InPersonAttendence
+#| fig-cap: Average Grade Change by In Person Attendence
 
 score_data = read_csv("../../inputs/data/scores_lm_demographics.csv")
 
@@ -162,7 +169,7 @@ score_data_summary_locale <- score_data_long_locale |>
 
 ggplot(score_data_summary_inperson, aes(y = share_inperson_grouped, x = round(mean_change * 100), color = time_period)) +
   geom_point(position = position_dodge(width = 0.2)) +
-  scale_x_continuous(limits = c(-15, 10), breaks = seq(-15, 5, by = 10)) +
+  scale_x_continuous(limits = c(-15, 10), breaks = seq(-15, 10, by = 5)) +
   labs(
     title = "Average Grade Change by In Person Attendence",
     y = "In-Person Share Group (%)",
@@ -183,10 +190,16 @@ ggplot(score_data_summary_inperson, aes(y = share_inperson_grouped, x = round(me
 
 ```
 
-```{r, fig.align='center', fig.cap = "Average Score Change by Geographic Locale"}
+The first observation that can be made is the percent change in test score between Spring 2019 and Spring 2021 where the students who who attended class less than 25% of the time had an average of 15% less in their Math tests and approximately 9% in their ELA tests. Although it can be seen that the more the students attended in person the less their test scores would decrease, never the less the students still saw a decrease in their test scores between the two years even if they had gone to school in person. One thing the original paper failed to include although it was in their data set, was the change in test scores of Spring 2022. While the test scores do increase in Math and ELA, ELA less so than Math, they do not increase as much as they fell in the previous year.
+
+
+
+```{r, fig.align='center'}
 
 #| echo: false
 #| warning: false
+#| label: fig-GeoLocale
+#| fig-cap: Average Grade Change by In Person Attendence
 
 
 # Plot for 'urban_centric_locale'
@@ -210,6 +223,8 @@ ggplot(score_data_summary_locale, aes(y = urban_centric_locale, x = round(mean_c
   ) +
   facet_wrap(~subject)
 ```
+
+Here we will look at the Geographic Locales of students, and how their grade have changed based on what type of municipality they live in. We can observe that Cities and suburbs of all sizes both in Math and ELA Scores. This may be due to a variety of reasons among them the Covid-19 in each of the specific localities. As cities are densely populated they are more likely to have had stricter lock down rules during the outbreak of Covid-19. Furthermore, suburbs are usually near cities and would likely have similar lock down rules to the cities they are near.
 
 ## Third Graph
 
@@ -420,6 +435,9 @@ ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
 ## Interesting point 1
 
 ## Intresting point 2
+
+@fig-InPersonAttendence
+
 
 ## Change in enrollment rate in kindergarden vs all
 
