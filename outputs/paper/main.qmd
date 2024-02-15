@@ -41,7 +41,10 @@ library(lubridate)
 
 # Introduction
 
-The outcomes of this paper are that there is an over all increase in the percent of enrollment as more in person schools are opened in the educational districts of United States. The concept fo educational districts will be described later in the data section for the user's aid but in this context it is not the most important.
+This paper will discuss several ways that the Covid-19 pandemic may have affected schools students and education as a whole. We will be looking at data procuded from all around the world , although we will be focusing on the data collected from the United States of America. First, we will be looking at school closures in the five major continents and some dductions we can make from them. Next, we will look at test scores for the USA in Mathematics as well as ELA(English Learning Arts), and how they changed from year to year, before, during, and after the pandemic. Lastly, the outcomes of this paper are that there is an over all increase in the percent of enrollment as more in person schools are opened in the educational districts of United States. The concept fo educational districts will be described later in the data section for the user's aid but in this context it is not the most important.
+
+We will also discuss the differences in our findings from the original paper as well as addition analasis from the datat provided from their replication package.
+
 
 # Data
 
