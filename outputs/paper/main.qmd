@@ -434,10 +434,9 @@ ggplot(weighted_means_kinder, aes(x = inperson_bin, y = weighted_mean_change)) +
 
 ## Interesting point 1
 
-## Intresting point 2
+## Change in Test Scores of 2022
 
-@fig-InPersonAttendence
-
+In the near identical Replication of the graph in the original paper(@fig-InPersonAttendence), we have included the year 2022 in the change in test scores, where the original paper failed to do so. This could could be due to a variety of reasons, among them possibly the fact that the original authors may have thought it to be unimportant, or they may have been trying to make the change in test scores to seem more permanent, as if the the virus had more long term effect. While the test scores did not increase as much as they fell, they increased never the less, although we do not have data for spring 2023, it is possible we could have made further conclusions with this additional information.
 
 ## Change in enrollment rate in kindergarden vs all
 
@@ -445,9 +444,15 @@ The third set of graphs that were shown in the results section was graphs that s
 
 ## Ethics and Bias could talk about mental health maybe but it might apply to other "interesting point"
 
+
+
 ## weakness and limitations
 
+As stated previously we do not have data for the test scores in 2023, which could give us additional information about how the pandemic affected students grades, as well as the younger students who were in elementary and middle schools when the pandemic began and how their educational foundations may have been affected.
+
 ## how to solve the limitations
+
+Furthermore, the best way to see the how test scores would change would be to wait several years and analyze the data that would be collected after a few ages complete these tests. While in the short term the test scores of Spring 2023 would be benefitial information to have before making any more conclusions than we have.
 
 ## Furthur questions?
 
