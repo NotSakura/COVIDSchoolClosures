@@ -98,7 +98,7 @@ As mentioned before the third claim that this paper looks at is the enrollment r
 # Results
 
 
-## School Closures
+## School Closures per Year by Continent and Country
 ```{r}
 #| echo: false
 #| warning: false
@@ -220,10 +220,7 @@ school closures in 2022, when Covid-19 restrictions were officially ceased. Nota
 the United States were compelled to learn in a remote environment for a much longer term than
 other countries
 
-## Standardized Tests vs COVID
-
-Here we will look at the change in percentage of test score of students between the years of 2017 and 2022. Covid-19 had a major impact on student test scores, whether it be because of the quality of remote learning or the resources the students may have or not have had while learning remotely. the first of the two figures is a near identical replication of the the on in the original paper we are replicating while the second figure is gives us some additional information to analyze that wasn't examined as thoroughly in the original paper.
-
+## Standardized Test Scores Analysis
 
 ```{r, fig.align='center'}
 #| echo: false
