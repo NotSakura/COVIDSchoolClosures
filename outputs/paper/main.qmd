@@ -1,6 +1,6 @@
 ---
 title: "COVID School Closures and Their Impact on Students"
-author: "Cristina Burca, Yan, Sakura"
+author: "Cristina Burca, Yan B. Mezhiborsky, Sakura"
 format: pdf
 date: 02/12/2024
 date-format: long
@@ -17,6 +17,7 @@ margins:
   bottom: 0.5in
   left: 0.5in
   right: 0.5in
+toc: true
 ---
 
 ```{r}
